@@ -1,0 +1,244 @@
+{
+  "create_dir_1000genome-20200406T033822Z_0_condorpool": [
+    "individuals_ID0000004",
+    "individuals_ID0000015",
+    "individuals_ID0000005",
+    "individuals_ID0000016",
+    "individuals_ID0000006",
+    "individuals_ID0000017",
+    "individuals_ID0000007",
+    "individuals_ID0000018",
+    "individuals_ID0000022",
+    "individuals_ID0000001",
+    "individuals_ID0000002",
+    "individuals_ID0000013",
+    "individuals_ID0000003",
+    "individuals_ID0000014",
+    "individuals_ID0000008",
+    "individuals_ID0000019",
+    "individuals_ID0000009",
+    "individuals_ID0000020",
+    "individuals_ID0000010",
+    "individuals_ID0000021",
+    "sifting_ID0000012",
+    "sifting_ID0000024"
+  ],
+  "individuals_ID0000004": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000015": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000005": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000016": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000006": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000017": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000007": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000018": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000022": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000001": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000002": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000013": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000003": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000014": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000008": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000019": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000009": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000020": [
+    "individuals_merge_ID0000023"
+  ],
+  "individuals_ID0000010": [
+    "individuals_merge_ID0000011"
+  ],
+  "individuals_ID0000021": [
+    "individuals_merge_ID0000023"
+  ],
+  "sifting_ID0000012": [
+    "frequency_ID0000030",
+    "mutation_overlap_ID0000031",
+    "frequency_ID0000036",
+    "frequency_ID0000026",
+    "mutation_overlap_ID0000033",
+    "frequency_ID0000038",
+    "frequency_ID0000032",
+    "frequency_ID0000034",
+    "mutation_overlap_ID0000027",
+    "mutation_overlap_ID0000029",
+    "frequency_ID0000028",
+    "mutation_overlap_ID0000035",
+    "mutation_overlap_ID0000037",
+    "mutation_overlap_ID0000025"
+  ],
+  "sifting_ID0000024": [
+    "frequency_ID0000050",
+    "frequency_ID0000040",
+    "frequency_ID0000052",
+    "frequency_ID0000046",
+    "mutation_overlap_ID0000041",
+    "frequency_ID0000048",
+    "mutation_overlap_ID0000043",
+    "frequency_ID0000042",
+    "frequency_ID0000044",
+    "mutation_overlap_ID0000051",
+    "mutation_overlap_ID0000039",
+    "mutation_overlap_ID0000049",
+    "mutation_overlap_ID0000045",
+    "mutation_overlap_ID0000047"
+  ],
+  "individuals_merge_ID0000011": [
+    "frequency_ID0000030",
+    "mutation_overlap_ID0000031",
+    "frequency_ID0000036",
+    "frequency_ID0000026",
+    "mutation_overlap_ID0000033",
+    "frequency_ID0000038",
+    "frequency_ID0000032",
+    "frequency_ID0000034",
+    "mutation_overlap_ID0000027",
+    "mutation_overlap_ID0000029",
+    "frequency_ID0000028",
+    "mutation_overlap_ID0000035",
+    "mutation_overlap_ID0000037",
+    "mutation_overlap_ID0000025"
+  ],
+  "individuals_merge_ID0000023": [
+    "frequency_ID0000050",
+    "frequency_ID0000040",
+    "frequency_ID0000052",
+    "frequency_ID0000046",
+    "mutation_overlap_ID0000041",
+    "frequency_ID0000048",
+    "mutation_overlap_ID0000043",
+    "frequency_ID0000042",
+    "frequency_ID0000044",
+    "mutation_overlap_ID0000051",
+    "mutation_overlap_ID0000039",
+    "mutation_overlap_ID0000049",
+    "mutation_overlap_ID0000045",
+    "mutation_overlap_ID0000047"
+  ],
+  "frequency_ID0000030": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "mutation_overlap_ID0000031": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "frequency_ID0000036": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "frequency_ID0000026": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "mutation_overlap_ID0000033": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "frequency_ID0000038": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "frequency_ID0000032": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "frequency_ID0000034": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "mutation_overlap_ID0000027": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "mutation_overlap_ID0000029": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "frequency_ID0000028": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "mutation_overlap_ID0000035": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "mutation_overlap_ID0000037": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "mutation_overlap_ID0000025": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "frequency_ID0000050": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "frequency_ID0000040": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "frequency_ID0000052": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "frequency_ID0000046": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "mutation_overlap_ID0000041": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "frequency_ID0000048": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "mutation_overlap_ID0000043": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "frequency_ID0000042": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "frequency_ID0000044": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "mutation_overlap_ID0000051": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "mutation_overlap_ID0000039": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "mutation_overlap_ID0000049": [
+    "stage_out_local_condorpool_2_1"
+  ],
+  "mutation_overlap_ID0000045": [
+    "stage_out_local_condorpool_2_2"
+  ],
+  "mutation_overlap_ID0000047": [
+    "stage_out_local_condorpool_2_0"
+  ],
+  "stage_out_local_condorpool_2_1": [
+    "cleanup_1000genome-20200406T033822Z_0_condorpool"
+  ],
+  "stage_out_local_condorpool_2_2": [
+    "cleanup_1000genome-20200406T033822Z_0_condorpool"
+  ],
+  "stage_out_local_condorpool_2_0": [
+    "cleanup_1000genome-20200406T033822Z_0_condorpool"
+  ],
+  "cleanup_1000genome-20200406T033822Z_0_condorpool": []
+}

@@ -1,0 +1,47 @@
+{
+  "create_dir_casa_nowcast-wf-20190325052200_0_condorpool": [
+    "NowcastToWDSS2_ID0000001"
+  ],
+  "NowcastToWDSS2_ID0000001": [
+    "merge_mrtV2_PID2_ID4",
+    "stage_out_local_condorpool_0_0",
+    "merge_merged_netcdf2png_PID2_ID2",
+    "merge_merged_netcdf2png_PID2_ID1",
+    "merge_merged_netcdf2png_PID2_ID4",
+    "merge_mrtV2_PID2_ID1",
+    "merge_merged_netcdf2png_PID2_ID3",
+    "merge_mrtV2_PID2_ID2",
+    "merge_mrtV2_PID2_ID3"
+  ],
+  "merge_mrtV2_PID2_ID4": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "stage_out_local_condorpool_0_0": [
+    "cleanup_casa_nowcast-wf-20190325052200_0_condorpool"
+  ],
+  "merge_merged_netcdf2png_PID2_ID2": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "merge_merged_netcdf2png_PID2_ID1": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "merge_merged_netcdf2png_PID2_ID4": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "merge_mrtV2_PID2_ID1": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "merge_merged_netcdf2png_PID2_ID3": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "merge_mrtV2_PID2_ID2": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "merge_mrtV2_PID2_ID3": [
+    "stage_out_local_condorpool_1_0"
+  ],
+  "stage_out_local_condorpool_1_0": [
+    "cleanup_casa_nowcast-wf-20190325052200_0_condorpool"
+  ],
+  "cleanup_casa_nowcast-wf-20190325052200_0_condorpool": []
+}

@@ -2,7 +2,7 @@
 #COBALT -A NuQMC
 #COBALT -n 2
 #COBALT -q full-node
-#COBALT -t 400
+#COBALT -t 600
 
 # User Configuration
 EXP_DIR=$PWD
@@ -15,7 +15,6 @@ source $INIT_SCRIPT
 
 # Getting the node names
 mapfile -t nodes_array -d '\n' < $COBALT_NODEFILE
-
 head_node=${nodes_array[0]}
 head_node_ip=$(dig $head_node a +short | awk 'FNR==2')
 
@@ -31,11 +30,11 @@ ssh -tt $head_node_ip "source $INIT_SCRIPT; cd $EXP_DIR; \
     --num-cpus $CPUS_PER_NODE --num-gpus $GPUS_PER_NODE --block" &
 
 # Optional, though may be useful in certain versions of Ray < 1.0.
-sleep 10
+sleep 40
 
 # Number of nodes other than the head node
 worker_num=$((${#nodes_array[*]} - 1))
-echo "$worker_num workers"
+echo "$worker_num ray  workers"
 
 for ((i = 1; i <= worker_num; i++)); do
     node_i=${nodes_array[$i]}

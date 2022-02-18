@@ -31,7 +31,7 @@ def load_data():
         #print(gx.shape, ge.shape, gy.shape)
         # print(gy)
         v_min, v_max = gx.min(), gx.max()
-        new_min, new_max = -1, 1
+        new_min, new_max = 0, 1
         gx = (gx - v_min)/(v_max - v_min)*(new_max - new_min) + new_min
         # print(gx.min(), gx.max())
         datasets.append( Data(x=gx, edge_index=ge, y=gy) )
@@ -41,20 +41,24 @@ def run(config: dict):
     import torch
     from torch.nn import Linear
     import torch.nn.functional as F
-    from torch_geometric.nn import  SAGEConv
+    from torch_geometric.nn import  SAGEConv, GCNConv
     from torch_geometric.nn import global_mean_pool
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class GCN(torch.nn.Module):
-        def __init__(self, hidden_channels, drop_rate, hidden):
+        def __init__(self, hidden_channels, drop_rate, hidden, layer_index):
             super(GCN, self).__init__()
+            layers = [SAGEConv, GCNConv]
             torch.manual_seed(12345)
-            self.conv1 = SAGEConv(14, hidden_channels).to(device)
+            self.conv1 = layers[layer_index](14, hidden_channels).to(device)
             self.conv2=[]
             for i in range(hidden):
-                self.conv2.append(SAGEConv(hidden_channels, hidden_channels).to(device) )
-            self.conv3 = SAGEConv(hidden_channels, hidden_channels).to(device)
+                self.conv2.append(layers[layer_index](hidden_channels, hidden_channels).to(device) )
+            self.conv3 = layers[layer_index](hidden_channels, hidden_channels).to(device)
             self.drop=drop_rate
+            self.lins=[]
+            for i in range(hidden):
+                self.conv2.append( Linear(hidden_channels, hidden_channels).to(device) )
             self.lin = Linear(hidden_channels, 4).to(device)
 
         def forward(self, x, edge_index, batch):
@@ -70,6 +74,9 @@ def run(config: dict):
             # 2. Readout layer
             x = global_mean_pool(x, batch)  # [batch_size, hidden_channels]
             # 3. Apply a final classifier
+            for i in range(len(self.lins)):
+                x = self.lins[i](x)
+                x = x.relu()
             x = F.dropout(x, p=self.drop, training=self.training)
             x = self.lin(x)
             return x
@@ -104,12 +111,13 @@ def run(config: dict):
     train_dataset = datasets[: int(len(datasets)*0.60) ]
     test_dataset = datasets[int(len(datasets)*0.60):int(len(datasets)*0.80)]
     random.shuffle(train_dataset)
-    train_dataset= train_dataset[0:2000]
+    train_dataset= train_dataset[0:200]
 
     train_loader = DataLoader(train_dataset, batch_size=int(config["batch_size"]), shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=int(config["batch_size"]), shuffle=False)
     model = GCN(hidden_channels=int(config["hidden"]), drop_rate = config["dropout"],\
-        hidden = int(config["hiddenlayer"])).float().to(device)
+                hidden = int(config["hiddenlayer"]),\
+                layer_type=int(config["layer_type"]) ).float().to(device)
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config["learning_rate"])
 
@@ -121,8 +129,6 @@ def run(config: dict):
     
     accu_test = test(model, test_loader)
     return accu_test
-
-
 
 # # We launch the Ray run-time and execute the `run` function
 # # with the default configuration
@@ -146,7 +152,7 @@ def get_evaluator(run_function):
     n_gpus = torch.cuda.device_count()
     # Default arguments for Ray: 1 worker and 1 worker per evaluation
     method_kwargs = {
-        "num_cpus": 1,
+        "address":'auto',
         "num_cpus_per_task": 1,
         "callbacks": [LoggerCallback()]
     }
@@ -154,6 +160,7 @@ def get_evaluator(run_function):
     # and use 1 worker for each evaluation
     if is_gpu_available:
         method_kwargs["num_gpus_per_task"] = 1
+
     evaluator = Evaluator.create(
         run_function,
         method="ray",
@@ -163,22 +170,23 @@ def get_evaluator(run_function):
     return evaluator
 
 
-
 def problem():
     # We define a dictionnary for the default values
     default_config = {
-        "hiddenlayer": 4,
+        "hiddenlayer": 2,
         "batch_size": 62,
         "dropout":  0.4,
         "learning_rate": 0.001,
-        "hidden":125    
+        "hidden":125,
+        "layer_type":0,
     }
     from deephyper.problem import HpProblem
     problem = HpProblem()
     # Discrete hyperparameter (sampled with uniform prior)
     # problem.add_hyperparameter((10, 1000), "num_epochs")
     # Discrete and Real hyperparameters (sampled with log-uniform)
-    problem.add_hyperparameter((3, 20, "uniform"), "hiddenlayer")
+    problem.add_hyperparameter((0, 1, "uniform"), "layer_type")
+    problem.add_hyperparameter((1, 4, "uniform"), "hiddenlayer")
     problem.add_hyperparameter((8, 128, "uniform"), "batch_size")
     problem.add_hyperparameter((8, 128, "uniform"), "hidden")
     problem.add_hyperparameter((0.001, 0.1, "log-uniform"), "learning_rate")
@@ -194,7 +202,7 @@ if __name__ == "__main__":
     from deephyper.evaluator import Evaluator
     prob1 = problem()
     evaluator_1= get_evaluator(run)
-    print("the total number of workers are", evaluator_1.num_workers) 
+    print("the total number of deep hyper workers are", evaluator_1.num_workers) 
     # Instanciate the search with the problem and a specific evaluator
     search = AMBS(prob1, evaluator_1)
-    search.search(max_evals=1000)
+    search.search(max_evals=200)

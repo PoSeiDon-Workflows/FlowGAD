@@ -1,6 +1,8 @@
+import torch
 from torch.nn import Linear
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv, ChebConv, SAGEConv
+from torch_geometric.nn import global_mean_pool
 
 class GCN(torch.nn.Module):
         def __init__(self, hidden_channels):

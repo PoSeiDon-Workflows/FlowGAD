@@ -16,8 +16,8 @@ from torch_geometric.datasets import TUDataset
 import torch.optim.lr_scheduler as lrs
 from torch_geometric.loader import DataLoader
 
-from parsing_functions import parse_data
-from models import GCN
+from helpers.parsing_functions import parse_data
+from helpers.models import GCN
 
 torch.manual_seed(12345)
 random.seed(12345)
@@ -126,6 +126,7 @@ def train_mod(flag, data_read=1, epochs=500):
     scheduler = lrs.ExponentialLR(optimizer, gamma=0.9)
     
     for epoch in range(1, epochs):
+        print(epoch)
         train(train_loader, model, criterion, optimizer)
         train_acc = test(train_loader, model)
         test_acc  = test(test_loader, model)
@@ -135,14 +136,14 @@ def train_mod(flag, data_read=1, epochs=500):
             print(f'Epoch: {epoch:03d}, Train Acc: {train_acc:.4f}, Test Acc: {test_acc:.4f}')
 
         if epoch%100==0:
-            torch.save(model.state_dict(), 'model_'+flag+'_')
+            torch.save(model.state_dict(), 'model_'+flag+'.pkl')
 
 
 type_names = [ "nowcast-clustering-16","1000genome", "nowcast-clustering-8",
               "wind-clustering-casa","wind-noclustering-casa" ]
 
 def main():
-	train_mod('1000genome', data_read=0, 500)
+	train_mod('1000genome', data_read=0, epochs=300)
 
 	return
 

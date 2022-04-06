@@ -30,12 +30,10 @@ def load_data(flag):
     json_path = ""
     
     for d in os.listdir("data"):
-        d = d.split("_")[0]
-        
+        d = d.split("_")[0]       
         if d in classes:
             continue
-        classes[d] = counter
-        
+        classes[d] = counter        
         counter += 1
         
     if flag == "nowcast-clustering-16":
@@ -79,8 +77,7 @@ def test(loader, model):
 
 
 def train_mod(flag, data_read=1, epochs=500):    
-    print(flag)
-    
+    print(flag)   
     # parse data from raw files
     if data_read ==0:
         graphs = load_data(flag)

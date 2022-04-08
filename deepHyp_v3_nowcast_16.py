@@ -128,7 +128,7 @@ def process_data(graphs, drop_columns):## Now, preprocess that for the columns I
 ## The main code for the deephyper run...
 def load_data():   
     import pickle
-    with open('graph_all_data_preprocessed.pkl','rb') as f:
+    with open('graph_nowcluster_16_preprocessed.pkl','rb') as f:
         graphs = pickle.load(f)
     drop_columns= [ 'stage_in_bytes', 'stage_out_bytes', 'kickstart_executables','kickstart_executables_argv']
     graphs = process_data(graphs, drop_columns)
@@ -212,7 +212,7 @@ def run(config: dict):
                 layer_index=int(config["layer_type"])).float().to(device)
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config["learning_rate"])
-    for epoch in range(1, 5000):     
+    for epoch in range(1, 300):     
         train(model, criterion, optimizer, train_loader)
         # train_acc = test(model, train_loader)
         # test_acc = test(model, test_loader)
@@ -268,7 +268,7 @@ def problem():
     # Discrete and Real hyperparameters (sampled with log-uniform)
     
     problem.add_hyperparameter((0, 1, "uniform"), "layer_type")
-    problem.add_hyperparameter((1, 10, "uniform"), "hiddenlayer")
+    problem.add_hyperparameter((1, 4, "uniform"), "hiddenlayer")
     problem.add_hyperparameter((8, 128, "uniform"), "batch_size")
     problem.add_hyperparameter((8, 128, "uniform"), "hidden")
     problem.add_hyperparameter((0.001, 0.1, "log-uniform"), "learning_rate")
@@ -290,4 +290,4 @@ if __name__ == "__main__":
     print("the total number of deep hyper workers are", evaluator_1.num_workers) 
     # Instantiate the search with the problem and a specific evaluator
     search = AMBS(prob1, evaluator_1)
-    search.search(max_evals=300)
+    search.search(max_evals=1000)

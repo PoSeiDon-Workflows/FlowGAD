@@ -7,20 +7,30 @@ import pickle
 import random
 
 import torch
-from torch_geometric.data import Data
 from torch.nn import Linear
 import torch.nn.functional as F
+import torch.optim.lr_scheduler as lrs
 from torch_geometric.nn import GCNConv, ChebConv, SAGEConv
 from torch_geometric.nn import global_mean_pool
 from torch_geometric.datasets import TUDataset
-import torch.optim.lr_scheduler as lrs
+from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 
 from helpers.parsing_functions import parse_data
 from helpers.models import GCN
 
+# for debbugging 
+from IPython import embed
+
+
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print("Type of an available device: {}".format(DEVICE))
+
+# for some level of reproducibility
 torch.manual_seed(12345)
 random.seed(12345)
+np.random.seed(12345)
+#torch.use_deterministic_algorithms(warn_only=True)
 
 
 def load_data(flag):
@@ -54,32 +64,37 @@ def load_data(flag):
 
 
 def train(train_loader, model, criterion, optimizer):
+    """Train a Graph Neural Network."""
     model.train()
     for data in train_loader:  # Iterate in batches over the training dataset.
-        out = model(data.x.float(), data.edge_index, data.batch)  # Perform a single forward pass.
-        loss = criterion(out, data.y)  # Compute the loss.
+        embed()
+        out = model(data.x.float().to(DEVICE), data.edge_index.to(DEVICE), data.batch.to(DEVICE))  # Perform a single forward pass.
+        loss = criterion(out, data.y.to(DEVICE))  # Compute the loss.
         loss.backward()  # Derive gradients.
         optimizer.step()  # Update parameters based on gradients.
         optimizer.zero_grad()  # Clear gradients.
+    return
 
 
 
-def test(loader, model):
+def evaluate(loader, model):
+    
     model.eval()
     correct = 0
     for data in loader:  # Iterate in batches over the training/test dataset.
-        out = model(data.x.float(), data.edge_index, data.batch)  
-        pred = out.argmax(dim=1)  # Use the class with highest probability.
+        out = model(data.x.float().to(DEVICE), data.edge_index.to(DEVICE), data.batch.to(DEVICE)) 
+        pred = out.argmax(dim=1).cpu()  # Use the class with highest probability.
         correct += int((pred == data.y).sum())  # Check against ground-truth labels.
+    
     return correct / len(loader.dataset)  # Derive ratio of correct predictions.
 
 
 
 
-def train_mod(flag, data_read=1, epochs=500):    
-    print(flag)   
+def train_model(flag, data_read=1, epochs=500):    
+    print("Workflow type: {}".format(flag))   
     # parse data from raw files
-    if data_read ==0:
+    if data_read == 0:
         graphs = load_data(flag)
         print(len(graphs))
         with open('graph_all_'+ str(flag) + '.pkl','wb') as f:
@@ -91,8 +106,8 @@ def train_mod(flag, data_read=1, epochs=500):
     y_list = []
     for gr in graphs:
         y_list.append(gr['y'])
-    print(min(y_list))
-    print(max(y_list))
+
+    print("Number of unique classes: {}".format(max(y_list) - min(y_list) + 1))
     print(np.unique(np.array(y_list), return_counts=True))  
     datasets=[]
 
@@ -116,23 +131,22 @@ def train_mod(flag, data_read=1, epochs=500):
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
     test_loader  = DataLoader(test_dataset, batch_size=64, shuffle=False)
     
-    model = GCN(hidden_channels=64).float()
-    
-    criterion = torch.nn.CrossEntropyLoss()
+    model     = GCN(hidden_channels=64).float().to(DEVICE)
+    criterion = torch.nn.CrossEntropyLoss().to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     scheduler = lrs.ExponentialLR(optimizer, gamma=0.9)
     
-    for epoch in range(1, epochs):
-        print(epoch)
+    for epoch in range(1, epochs+1):
+        print("Current epoch: {}".format(epoch))
         train(train_loader, model, criterion, optimizer)
-        train_acc = test(train_loader, model)
-        test_acc  = test(test_loader, model)
+        train_acc = evaluate(train_loader, model)
+        test_acc  = evaluate(test_loader, model)
         
-        if epoch%100==0:
+        if epoch%10==0:
             scheduler.step()
-            print(f'Epoch: {epoch:03d}, Train Acc: {train_acc:.4f}, Test Acc: {test_acc:.4f}')
+            print(f'Epoch: {epoch:d}, Train Acc: {train_acc:.4f}, Test Acc: {test_acc:.4f}')
 
-        if epoch%100==0:
+        if epoch%10==0:
             torch.save(model.state_dict(), 'model_'+flag+'.pkl')
 
 
@@ -140,7 +154,7 @@ type_names = [ "nowcast-clustering-16","1000genome", "nowcast-clustering-8",
               "wind-clustering-casa","wind-noclustering-casa" ]
 
 def main():
-	train_mod('1000genome', data_read=0, epochs=300)
+	train_model("1000genome", data_read=0, epochs=21)
 
 	return
 

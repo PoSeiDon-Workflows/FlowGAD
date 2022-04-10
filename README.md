@@ -2,15 +2,15 @@
 
 
 ## Repo Content
-- adjacency_list_dags: json files with dependencies between nodes in each workflow
-- data: raw data - characterizations of jobs in each workflow during multiple execustions
-- deepHyp_scripts: scripts connected to finding best hyperparameters for GNN
-- helpers: helper scripts that include functions and class definitions (models)
-- notebooks: notebooks used during the code development
-- pickles: pickle data from previous experiments (processsed raw data)
-- preprocess_graph_data: pickles with workflow data in format expected by PyG
-- results: csv files with results
-- submission scripts: bash scripts for jobs submissions
+- **adjacency_list_dags**: json files with dependencies between nodes in each workflow
+- **data**: raw data - characterizations of jobs in each workflow during multiple execustions
+- **deepHyp_scripts**: scripts connected to finding best hyperparameters for GNN
+- **helpers**: helper scripts that include functions and class definitions (models)
+- **notebooks**: notebooks used during the code development
+- **pickles**: pickle data from previous experiments (processsed raw data)
+- **preprocess_graph_data**: pickles with workflow data in format expected by PyG
+- **results**: csv files with results
+- **submission_scripts**: bash scripts for jobs submissions
 
 
 
@@ -25,16 +25,6 @@
 python3 preprocess_data.py --workflow_type all
 ```
 
-Workflow type: nowcast-clustering-16
-11070
-Workflow type: 1000genome
-72675
-Workflow type: nowcast-clustering-8
-15990
-Workflow type: wind-clustering-casa
-8610
-Workflow type: wind-noclustering-casa
-30914
 
 
 | Workflow Type          | Node # | 

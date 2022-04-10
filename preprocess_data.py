@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import random
+import argparse
 
 from helpers.parsing_functions import parse_data
 
@@ -15,6 +16,17 @@ from IPython import embed
 # for some level of reproducibility
 random.seed(12345)
 np.random.seed(12345)
+
+
+def get_arguments():
+    
+    parser = argparse.ArgumentParser(description="Data preprocessing for GNN")    
+    parser.add_argument('-workflow_type', type=str, default="ALL", help='name of a workflow: nowcast-clustering-16,'
+        + '1000genome,nowcast-clustering-8,wind-clustering-casa,wind-noclustering-casa or ALL')   
+    args = parser.parse_args()
+    
+    return args
+
 
 
 def create_dir(path):
@@ -58,26 +70,36 @@ def load_data(flag):
     return graphs
 
 
-def preprocess_data(wf_name, path):
+def preprocess_data(wf_name, path, workflows_names):
 
     print("Workflow type: {}".format(wf_name))   
     # parse data from raw files
+    graphs = []
 
-    graphs = load_data(wf_name)
+    if wf_name == "ALL":
+        for wf in workflows_names:
+            graphs.append(load_data(wf))
+    else:
+        graphs = load_data(wf_name)
     print(len(graphs))
     with open(path +'graph_all_'+ str(wf_name) + '.pkl','wb') as f:
         pickle.dump(graphs, f)
 
 
 def main():
+    args = get_arguments()
+    wf_name = args.workflow_type
 
     workflows_names = [ "nowcast-clustering-16","1000genome", "nowcast-clustering-8",
-              "wind-clustering-casa","wind-noclustering-casa" ]
+              "wind-clustering-casa","wind-noclustering-casa"]
+    if wf_name not in workflows_names and wf_name != "ALL":
+        print("Invalid workflow name.")
+        exit()
 
     path = "preprocess_graph_data/"
     create_dir(path)
-    for wf_name in workflows_names:
-        preprocess_data(wf_name, path)
+    preprocess_data(wf_name, path, workflows_names)
+
     return
 
 if __name__ == '__main__':

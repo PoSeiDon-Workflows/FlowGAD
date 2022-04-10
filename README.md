@@ -40,7 +40,15 @@ Comment: raw data includes a number of invalid files from wind-nonclustering-cas
 
 The script usage:
 ```
-usage: 
+usage: preprocess_data.py [-h] [--workflow_type WORKFLOW_TYPE]
+
+Data preprocessing for GNN
+
+options:
+  -h, --help            show this help message and exit
+  --workflow_type WORKFLOW_TYPE
+                        name of a workflow: nowcast-clustering-16,1000genome,nowcast-
+                        clustering-8,wind-clustering-casa,wind-noclustering-casa or ALL 
 
 ```
 

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-""" PoSeiDon dataset wrapper for PyG.
+""" PoSeiDon dataset wrapper as PyG.dataset.
 
 Author: Hongwei Jin <jinh@anl.gov>
 License: TBD
@@ -8,15 +7,14 @@ License: TBD
 import glob
 import json
 import os.path as osp
+import random
+import shutil
 
+import numpy as np
 import pandas as pd
 import torch
-import torch.nn.functional as F
-import torch_geometric.transforms as T
-from torch_geometric.data import Data, InMemoryDataset
-from torch_geometric.loader import DataLoader
+from torch_geometric.data import Batch, Data, InMemoryDataset
 
-from psd_gnn.base_model import GNN
 from psd_gnn.utils import create_dir
 
 
@@ -25,13 +23,13 @@ class PSD_Dataset(InMemoryDataset):
     def __init__(self,
                  root="./",
                  name="1000genome",
-                 anomaly_type="all",
-                 attr_options="s1",
+                 #  anomaly_type="all",
                  use_node_attr=True,
                  use_edge_attr=False,
                  force_reprocess=False,
                  node_level=False,
                  binary_labels=False,
+                 normalize=True,
                  transform=None,
                  pre_transform=None,
                  pre_filter=None):
@@ -49,31 +47,38 @@ class PSD_Dataset(InMemoryDataset):
             pre_filter (callable, optional): Pre filter function. Defaults to None.
         """
         self.name = name.lower()
-        self.anomaly_type = anomaly_type.lower()
-        assert self.anomaly_type in ["all", "cpu", "hdd", "loss"]
-        self.attr_options = attr_options.lower()
-        assert self.attr_options in ["s1", "s2", "s3"]
-        # TODO: force to reprocess again
+        # self.anomaly_type = anomaly_type.lower()
+        # assert self.anomaly_type in ["all", "cpu", "hdd", "loss"]
+        # self.attr_options = attr_options.lower()
+        # assert self.attr_options in ["s1", "s2", "s3"]
+        # force to reprocess again
         self.force_reprocess = force_reprocess
         self.node_level = node_level
         self.use_node_attr = use_node_attr
         self.use_edge_attr = use_edge_attr
         self.binary_labels = binary_labels
-        super().__init__(root, transform, pre_transform, pre_filter)
+        self.normalize = normalize
+        if self.force_reprocess:
+            SAVED_PATH = osp.join(osp.abspath(root), "processed", self.name)
+            if osp.exists(SAVED_PATH):
+                shutil.rmtree(SAVED_PATH)
         # load data if processed
-        if not self.force_reprocess:
-            self.data, self.slices = torch.load(self.processed_paths[0])
+        super().__init__(root, transform, pre_transform, pre_filter)
+        # if self.force_reprocess:
+        #     os.remove(self.processed_paths[0])
+        self.data, self.slices = torch.load(self.processed_paths[0])
 
     @property
     def processed_file_names(self):
-        """ Processed file name(s).
+        r"""The name of the files in the :obj:`self.processed_dir` folder that
+        must be present in order to skip processing.
 
         Returns:
             list: List of file names.
         """
-        SAVED_PATH = osp.join(osp.abspath(self.root), "processed", f"{self.name}")
+        SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
         create_dir(SAVED_PATH)
-        return [f'{SAVED_PATH}/data_{self.name}.pt']
+        return [f'{SAVED_PATH}/data_binary_{self.binary_labels}_node_{self.node_level}.pt']
 
     @property
     def num_node_attributes(self):
@@ -98,10 +103,11 @@ class PSD_Dataset(InMemoryDataset):
     def process(self):
         """ Process the raw files, and save to processed files. """
         ''' process adj file '''
-        # TODO: process the entire graphs
         if self.name == "all":
+            # TODO: process the entire graphs
             pass
         else:
+            # TODO: find the path in relative location
             adj_file = f"./adjacency_list_dags/{self.name.replace('-', '_')}.json"
         d = json.load(open(adj_file))
 
@@ -129,75 +135,97 @@ class PSD_Dataset(InMemoryDataset):
         # convert the edge_index with dim (2, E)
         edge_index = torch.tensor(edges).T
 
-        # binary labels / multi lables
-        if self.binary_labels:
-            classes = {"normal": 0, "cpu": 1, "hdd": 1, "loss": 1}
-        else:
-            classes = {"normal": 0, "cpu": 1, "hdd": 2, "loss": 3}
-
-        # REVIEW: verify the features.
-        features = ['type',
-                    # 'ready',
-                    # 'submit',
-                    'wms_delay',
-                    'pre_script_delay',
-                    'queue_delay',
-                    'runtime',
-                    'post_script_delay',
-                    'stage_in_delay',
-                    'stage_out_delay']
-
-        # features = ['auxiliary', 'compute', 'transfer',
-        #             'pre_script_delay',
-        #             'post_script_delay',
-        #             'wms_delay',
-        #             'queue_delay',
-        #             'runtime',
-        #             'stage_in_delay',
-        #             'stage_out_delay']
-
+        features = ['auxiliary', 'compute', 'transfer'] + \
+            ['is_clustered', 'ready', 'pre_script_start',
+             'pre_script_end', 'submit', 'execute_start', 'execute_end',
+             'post_script_start', 'post_script_end', 'wms_delay', 'pre_script_delay',
+             'queue_delay', 'runtime', 'post_script_delay', 'stage_in_delay',
+             'stage_in_bytes', 'stage_out_delay', 'stage_out_bytes', 'kickstart_executables_cpu_time',
+             'kickstart_status', 'kickstart_executables_exitcode']
         data_list = []
+        feat_list = []
         n = len(nodes)
         for filename in glob.glob(f"./data/*/{self.name.replace('_', ' - ')}*.csv"):
-            # TODO: process labels according to classes
-            if "normal" in filename:
-                y = torch.tensor([0]) if not self.node_level else torch.tensor([0] * n)
-            elif "cpu" in filename:
-                y = torch.tensor([1]) if not self.node_level else torch.tensor([0] * n)
-            elif "hdd" in filename:
-                y = torch.tensor([2]) if not self.node_level else torch.tensor([0] * n)
-            elif "loss" in filename:
-                y = torch.tensor([3]) if not self.node_level else torch.tensor([0] * n)
+            # process labels according to classes
+            if self.binary_labels:
+                if "normal" in filename:
+                    y = torch.tensor([0]) if not self.node_level else torch.tensor([0] * n)
+                else:
+                    y = torch.tensor([1]) if not self.node_level else torch.tensor([1] * n)
+            else:
+                if "normal" in filename:
+                    y = torch.tensor([0]) if not self.node_level else torch.tensor([0] * n)
+                elif "cpu" in filename:
+                    y = torch.tensor([1]) if not self.node_level else torch.tensor([1] * n)
+                elif "hdd" in filename:
+                    y = torch.tensor([2]) if not self.node_level else torch.tensor([2] * n)
+                elif "loss" in filename:
+                    y = torch.tensor([3]) if not self.node_level else torch.tensor([3] * n)
 
             df = pd.read_csv(filename, index_col=[0])
 
-            df = df[features]
-            # change the index same with `nodes`
-            for i, n in enumerate(df.index.values):
-                if n.startswith("create_dir_") or n.startswith("cleanup_"):
-                    new_name = n.split("-")[0]
-                    df.index.values[i] = new_name
+            # handle missing features
+            if "kickstart_executables_cpu_time" not in df.columns:
+                continue
+            # handle the nowind workflow
+            if df.shape[0] != len(nodes):
+                continue
 
-            # sort with nodes index
-            df = df.iloc[df.index.map(nodes).argsort()]
-            # convert type into hot vectors
+            # convert type to dummy features
             df = pd.concat([pd.get_dummies(df.type), df], axis=1)
-            # remove `type`
             df = df.drop(["type"], axis=1)
-            # fill NaN with 0
+            df = df[features]
             df = df.fillna(0)
 
-            # REVIEW: convert ts to gaps
-            # df['ready'] = df['ready'] - df['ready'].min()
-            # df['submit'] = df['submit'] - df['submit'].min()
+            # shift timestamps
+            ts_anchor = df['ready'].min()
+            for attr in ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']:
+                df[attr] -= ts_anchor
+
+            # change the index same with `nodes`
+            for i, node in enumerate(df.index.values):
+                if node.startswith("create_dir_") or node.startswith("cleanup_"):
+                    new_name = node.split("-")[0]
+                    df.index.values[i] = new_name
 
             x = torch.tensor(df.to_numpy(), dtype=torch.float32)
-
+            feat_list.append(df.to_numpy())
             data = Data(x=x, edge_index=edge_index, y=y)
             data_list.append(data)
 
-        data, slices = self.collate(data_list)
-        torch.save((data, slices), self.processed_paths[0])
+        # normalize across jobs
+        # backend: numpy
+        if self.normalize:
+            all_feat = np.array(feat_list)
+            v_min = all_feat.min(axis=1, keepdims=True)
+            v_max = all_feat.max(axis=1, keepdims=True)
+            norm_feat = (all_feat - v_min) / (v_max - v_min)
+            np.nan_to_num(norm_feat, 0)
+            for i, x in enumerate(norm_feat):
+                data_list[i].x = torch.tensor(x, dtype=torch.float32)
+
+        # backend: pytorch
+        # if self.normalize:
+        #     all_feat = torch.stack(feat_list)
+        #     v_min = torch.min(all_feat, dim=1, keepdim=True)[0]
+        #     v_max = torch.max(all_feat, dim=1, keepdim=True)[0]
+        #     norm_feat = (all_feat - v_min) / (v_max - v_min)
+        #     torch.nan_to_num(norm_feat, 0, 1, 0)
+        #     for i, x in enumerate(norm_feat):
+        #         data_list[i].x = torch.tensor(x, dtype=torch.float32)
+
+        random.shuffle(data_list)
+
+        # Save processed data
+        if self.node_level:
+            data_batch = Batch.from_data_list(data_list)
+            data = Data(x=data_batch.x, edge_index=data_batch.edge_index, y=data_batch.y)
+            data = data if self.pre_transform is None else self.pre_transform(data)
+            # TODO update with train_mask, val_mask, test_mask
+            torch.save(self.collate([data]), self.processed_paths[0])
+        else:
+            data, slices = self.collate(data_list)
+            torch.save((data, slices), self.processed_paths[0])
 
     def __repr__(self):
-        return f'{self.name}({len(self)})'
+        return f'{self.name}({len(self)}) node_level {self.node_level} binary_labels {self.binary_labels}'

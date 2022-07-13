@@ -1,92 +1,91 @@
-import json
-import glob
-import os
-import pandas as pd
-import numpy as np
+import argparse
+import os.path as osp
 import pickle
 import random
 
+import numpy as np
 import torch
-from torch.nn import Linear
-import torch.nn.functional as F
 import torch.optim.lr_scheduler as lrs
-from torch_geometric.nn import GCNConv, ChebConv, SAGEConv
-from torch_geometric.nn import global_mean_pool
-from torch_geometric.datasets import TUDataset
 from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
+from tqdm import tqdm
 
-from helpers.parsing_functions import parse_data
-from helpers.models import GCN
-
-# for debbugging 
-from IPython import embed
+from psd_gnn.models import GCN
+from psd_gnn.utils import parse_data
 
 
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print("Type of an available device: {}".format(DEVICE))
+def load_data(flag, label="all"):
+    """ Load data from json file
 
-# for some level of reproducibility
-torch.manual_seed(12345)
-random.seed(12345)
-np.random.seed(12345)
-#torch.use_deterministic_algorithms(warn_only=True)
+    Args:
+        flag (str): Name of graphs.
+        label (str, optional): Label of abnormal scenarios. Defaults to "all".
 
+    Returns:
+        dict: Graph in dictionary structure.
+    """
+    if label == "all":
+        classes = {"normal": 0, "cpu": 1, "hdd": 2, "loss": 3}
+    elif label == "cpu":
+        classes = {"normal": 0, "cpu": 1}
+    elif label == "hdd":
+        classes = {"normal": 0, "hdd": 1}
+    elif label == "loss":
+        classes = {"normal": 0, "loss": 1}
 
-def load_data(flag):
-
-    classes = {"normal": 0}
-    counter = 1
-    json_path = ""
-    
-    for d in os.listdir("data"):
-        d = d.split("_")[0]       
-        if d in classes:
-            continue
-        classes[d] = counter        
-        counter += 1
-        
-    if flag == "nowcast-clustering-16":
-        json_path = "adjacency_list_dags/casa_nowcast_clustering_16.json"
-    elif flag == "1000genome":
-        json_path = "adjacency_list_dags/1000genome.json"
-    elif flag =="nowcast-clustering-8":
-        json_path = "adjacency_list_dags/casa_nowcast_clustering_8.json"
-    elif flag == "wind-clustering-casa":
-        json_path = "adjacency_list_dags/casa_wind_clustering.json"
-    elif flag == "wind-noclustering-casa":
-        json_path = "adjacency_list_dags/casa_wind_no_clustering.json"
-        
+    json_path = f"adjacency_list_dags/{flag}.json"
+    json_path = json_path.replace("-", "_")
     graphs = parse_data(flag, json_path, classes)
     return graphs
 
 
-
-
 def train(train_loader, model, criterion, optimizer):
-    """Train a Graph Neural Network."""
+    """ Train a Graph Neural Network.
+
+    Args:
+        train_loader (pyg.DataLoader): Train dataloader.
+        model (object): Model object.
+        criterion (function handler): Loss function.
+        optimizer (function handler): Optimizer function.
+    """
     model.train()
-    for data in train_loader:  # Iterate in batches over the training dataset.
-        embed()
-        out = model(data.x.float().to(DEVICE), data.edge_index.to(DEVICE), data.batch.to(DEVICE))  # Perform a single forward pass.
-        loss = criterion(out, data.y.to(DEVICE))  # Compute the loss.
-        loss.backward()  # Derive gradients.
-        optimizer.step()  # Update parameters based on gradients.
-        optimizer.zero_grad()  # Clear gradients.
-    return
+
+    total_loss = 0
+    for data in train_loader:
+        # Perform a single forward pass.
+        data = data.to(DEVICE)
+        optimizer.zero_grad()           # Clear gradients.
+        out = model(data.x.float(), data.edge_index, data.batch)
+        loss = criterion(out, data.y)   # Compute the loss.
+        loss.backward()                 # Derive gradients.
+        optimizer.step()                # Update parameters based on gradients.
+        total_loss += float(loss) * data.num_graphs
+
+    return total_loss / len(train_loader.dataset)
 
 
+def evaluate(loader, model, testing=False):
+    """ Evaluate the GNN model.
 
-def evaluate(loader, model):
-    
+    Args:
+        loader (pyg.DataLoader): Dataloader to evaluate.
+        model (object): Model object.
+        testing (bool, optional): Testing case. Defaults to "False".
+
+    Returns:
+        float: Accuracy rate.
+    """
     model.eval()
     correct = 0
-    for data in loader:  # Iterate in batches over the training/test dataset.
-        out = model(data.x.float().to(DEVICE), data.edge_index.to(DEVICE), data.batch.to(DEVICE)) 
-        pred = out.argmax(dim=1).cpu()  # Use the class with highest probability.
+    # Iterate in batches over the training/test dataset.
+    for data in loader:
+        data = data.to(DEVICE)
+        out = model(data.x.float(), data.edge_index, data.batch)
+        pred = out.argmax(dim=1)                # Use the class with highest probability.
         correct += int((pred == data.y).sum())  # Check against ground-truth labels.
-    
-    return correct / len(loader.dataset)  # Derive ratio of correct predictions.
+
+    # Derive ratio of correct predictions.
+    return correct / len(loader.dataset)
 
 
 

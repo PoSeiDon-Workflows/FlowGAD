@@ -1,19 +1,47 @@
 # -*- coding: utf-8 -*-
 """ A base model for the graph classification.
 
-Author: Hongwei Jin <jinh@anl.gov>
 License: TBD
+Date: 2022-06-30
 """
 import torch
 import torch.nn.functional as F
 from torch.nn import Linear
-from torch_geometric.nn import GraphConv, TopKPooling
+from torch_geometric.nn import GraphConv, TopKPooling, SAGEConv
 from torch_geometric.nn import global_max_pool as gmp
 from torch_geometric.nn import global_mean_pool as gap
 
 
 class GNN(torch.nn.Module):
-    def __init__(self, in_channels, out_channels):
+    """ A GraphSage based model """
+    def __init__(self, in_channels, hidden_channels, out_channels, dropout=0.5):
+        super(GCN, self).__init__()
+        self.conv1 = SAGEConv(in_channels, hidden_channels)
+        self.conv2 = SAGEConv(hidden_channels, hidden_channels)
+        self.conv3 = SAGEConv(hidden_channels, hidden_channels)
+        self.lin = Linear(hidden_channels, out_channels)
+        self.dropout = dropout
+
+    def forward(self, x, edge_index, batch):
+        # 1. Obtain node embeddings
+        x = self.conv1(x, edge_index)
+        x = x.relu()
+        x = self.conv2(x, edge_index)
+        x = x.relu()
+        x = self.conv3(x, edge_index)
+
+        # 2. Readout layer
+        x = gap(x, batch)
+
+        # 3. Apply a final classifier
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = self.lin(x)
+        return x
+
+
+class GCN(torch.nn.Module):
+    """ A GCN based model """
+    def __init__(self, in_channels, hidden_channels, out_channels, dropout=0.5):
         super().__init__()
 
         self.in_channels = in_channels
@@ -28,6 +56,7 @@ class GNN(torch.nn.Module):
         self.lin1 = Linear(256, 128)
         self.lin2 = Linear(128, 64)
         self.lin3 = Linear(64, self.out_channels)
+        self.dropout = dropout
 
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
@@ -47,7 +76,7 @@ class GNN(torch.nn.Module):
         x = x1 + x2 + x3
 
         x = F.relu(self.lin1(x))
-        x = F.dropout(x, p=0.5, training=self.training)
+        x = F.dropout(x, p=self.dropout, training=self.training)
         x = F.relu(self.lin2(x))
         x = F.log_softmax(self.lin3(x), dim=-1)
 

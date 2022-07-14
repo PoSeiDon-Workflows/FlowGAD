@@ -218,14 +218,27 @@ class PSD_Dataset(InMemoryDataset):
         #     for i, x in enumerate(norm_feat):
         #         data_list[i].x = torch.tensor(x, dtype=torch.float32)
 
-        random.shuffle(data_list)
-
         # Save processed data
         if self.node_level:
             data_batch = Batch.from_data_list(data_list)
             data = Data(x=data_batch.x, edge_index=data_batch.edge_index, y=data_batch.y)
             data = data if self.pre_transform is None else self.pre_transform(data)
-            # TODO update with train_mask, val_mask, test_mask
+
+            # NOTE: split the dataset into train/val/test as 20/20/60
+            idx = np.arange(data.num_nodes)
+            train_idx, test_idx = train_test_split(
+                idx, test_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
+            train_idx, val_idx = train_test_split(
+                train_idx, test_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[train_idx])
+
+            data.train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            data.train_mask[train_idx] = 1
+
+            data.val_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            data.val_mask[val_idx] = 1
+
+            data.test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            data.test_mask[test_idx] = 1
             torch.save(self.collate([data]), self.processed_paths[0])
         else:
             data, slices = self.collate(data_list)

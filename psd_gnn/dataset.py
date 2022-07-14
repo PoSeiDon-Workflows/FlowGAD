@@ -16,6 +16,7 @@ import torch
 from torch_geometric.data import Batch, Data, InMemoryDataset
 
 from psd_gnn.utils import create_dir
+from sklearn.model_selection import train_test_split
 
 
 class PSD_Dataset(InMemoryDataset):
@@ -103,12 +104,13 @@ class PSD_Dataset(InMemoryDataset):
     def process(self):
         """ Process the raw files, and save to processed files. """
         ''' process adj file '''
+        adj_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "adjacency_list_dags")
+        data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data")
         if self.name == "all":
             # TODO: process the entire graphs
             pass
         else:
-            # TODO: find the path in relative location
-            adj_file = f"./adjacency_list_dags/{self.name.replace('-', '_')}.json"
+            adj_file = osp.join(adj_folder, f"{self.name.replace('-', '_')}.json")
         d = json.load(open(adj_file))
 
         # build dict of nodes
@@ -145,7 +147,7 @@ class PSD_Dataset(InMemoryDataset):
         data_list = []
         feat_list = []
         n = len(nodes)
-        for filename in glob.glob(f"./data/*/{self.name.replace('_', ' - ')}*.csv"):
+        for filename in glob.glob(f"{data_folder}/*/{self.name.replace('_', ' - ')}*.csv"):
             # process labels according to classes
             if self.binary_labels:
                 if "normal" in filename:
@@ -197,8 +199,10 @@ class PSD_Dataset(InMemoryDataset):
         # backend: numpy
         if self.normalize:
             all_feat = np.array(feat_list)
-            v_min = all_feat.min(axis=1, keepdims=True)
-            v_max = all_feat.max(axis=1, keepdims=True)
+            # v_min = all_feat.min(axis=1, keepdims=True)
+            # v_max = all_feat.max(axis=1, keepdims=True)
+            v_min = np.concatenate(all_feat).min(axis=0)
+            v_max = np.concatenate(all_feat).max(axis=0)
             norm_feat = (all_feat - v_min) / (v_max - v_min)
             np.nan_to_num(norm_feat, 0)
             for i, x in enumerate(norm_feat):

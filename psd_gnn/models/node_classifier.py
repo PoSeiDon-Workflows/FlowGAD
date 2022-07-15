@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-""" A base model for the graph classification.
+""" A base model for the node classification.
 
 License: TBD
 Date: 2022-06-30
 """
+
 import torch
 import torch.nn.functional as F
-from torch.nn import Linear, Module, ReLU, ModuleList, Sequential
-from torch_geometric.nn import GraphConv, TopKPooling, SAGEConv, GCNConv
-from torch_geometric.nn import global_max_pool as gmp
-from torch_geometric.nn import global_mean_pool as gap
+from torch.nn import Linear, ModuleList, ReLU, Sequential
+from torch_geometric.nn import GCNConv, SAGEConv
+torch.manual_seed(0)
 
 
 class GNN(torch.nn.Module):
@@ -54,8 +54,7 @@ class GNN(torch.nn.Module):
 
     def forward(self,
                 x: torch.Tensor,
-                edge_index: torch.Tensor,
-                batch: torch.Tensor) -> torch.Tensor:
+                edge_index: torch.Tensor) -> torch.Tensor:
         """ Processing the GNN model.
 
         Args:
@@ -72,9 +71,6 @@ class GNN(torch.nn.Module):
             else:
                 x = layer(x)
 
-        # NOTE: add the readout layer
-        x = gap(x, batch)
-
         # pass the output to the linear output layer
         out = self.flatten(x)
 
@@ -82,7 +78,7 @@ class GNN(torch.nn.Module):
         return F.log_softmax(out, dim=1)
 
 
-class GNN_v2(Module):
+class GNN_v2(torch.nn.Module):
     """ A GraphSage based model (old version) """
 
     def __init__(self, in_channels, hidden_channels, out_channels, dropout=0.5):
@@ -93,7 +89,7 @@ class GNN_v2(Module):
         self.lin = Linear(hidden_channels, out_channels)
         self.dropout = dropout
 
-    def forward(self, x, edge_index, batch):
+    def forward(self, x, edge_index):
         # 1. Obtain node embeddings
         x = self.conv1(x, edge_index)
         x = x.relu()
@@ -101,56 +97,9 @@ class GNN_v2(Module):
         x = x.relu()
         x = self.conv3(x, edge_index)
 
-        # 2. Readout layer
-        x = gap(x, batch)
+        # NOTE: without global pooling layer
 
-        # 3. Apply a final classifier
+        # 2. Apply a final classifier
         x = F.dropout(x, p=self.dropout, training=self.training)
         x = self.lin(x)
         return x
-
-
-# class GNN(torch.nn.Module):
-#     """ A GCN based model """
-
-#     def __init__(self, in_channels, hidden_channels, out_channels, dropout=0.5):
-#         super().__init__()
-
-#         self.in_channels = in_channels
-#         self.out_channels = out_channels
-#         self.hidden_channels = hidden_channels
-#         self.conv1 = GraphConv(self.in_channels, self.hidden_channels)
-#         self.pool1 = TopKPooling(self.hidden_channels, ratio=0.8)
-#         self.conv2 = GraphConv(self.hidden_channels, self.hidden_channels)
-#         self.pool2 = TopKPooling(self.hidden_channels, ratio=0.8)
-#         self.conv3 = GraphConv(self.hidden_channels, self.hidden_channels)
-#         self.pool3 = TopKPooling(self.hidden_channels, ratio=0.8)
-
-#         self.lin1 = Linear(256, self.hidden_channels)
-#         self.lin2 = Linear(self.hidden_channels, 64)
-#         self.lin3 = Linear(64, self.out_channels)
-#         self.dropout = dropout
-
-#     def forward(self, data):
-#         x, edge_index, batch = data.x, data.edge_index, data.batch
-
-#         x = F.relu(self.conv1(x, edge_index))
-#         x, edge_index, _, batch, _, _ = self.pool1(x, edge_index, None, batch)
-#         x1 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
-
-#         x = F.relu(self.conv2(x, edge_index))
-#         x, edge_index, _, batch, _, _ = self.pool2(x, edge_index, None, batch)
-#         x2 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
-
-#         x = F.relu(self.conv3(x, edge_index))
-#         x, edge_index, _, batch, _, _ = self.pool3(x, edge_index, None, batch)
-#         x3 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
-
-#         x = x1 + x2 + x3
-
-#         x = F.relu(self.lin1(x))
-#         x = F.dropout(x, p=self.dropout, training=self.training)
-#         x = F.relu(self.lin2(x))
-#         x = F.log_softmax(self.lin3(x), dim=-1)
-
-#         return x

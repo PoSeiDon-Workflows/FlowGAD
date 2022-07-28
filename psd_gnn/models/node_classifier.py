@@ -15,7 +15,6 @@ torch.manual_seed(0)
 class GNN(torch.nn.Module):
     def __init__(self,
                  n_node_features: int,
-                 n_edge_features: int,
                  n_hidden: int,
                  n_output: int,
                  n_conv_blocks: int = 1) -> None:
@@ -23,7 +22,6 @@ class GNN(torch.nn.Module):
 
         Args:
             n_node_features (int): Number of features at node level.
-            n_edge_features (int): Number of features at edge level.
             n_hidden (int): Number of hidden dimension.
             n_output (int): number of output dimension
             n_conv_blocks (int): Number of

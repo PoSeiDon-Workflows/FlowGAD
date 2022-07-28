@@ -114,8 +114,7 @@ class PSD_Dataset(InMemoryDataset):
         adj_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "adjacency_list_dags")
         data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data")
         if self.name == "all":
-            # TODO: process the entire graphs
-            pass
+            raise "please load dataset from `Merge_PSD_Dataset`"
         else:
             adj_file = osp.join(adj_folder, f"{self.name.replace('-', '_')}.json")
         d = json.load(open(adj_file))
@@ -193,7 +192,7 @@ class PSD_Dataset(InMemoryDataset):
             for attr in ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']:
                 df[attr] -= ts_anchor
 
-            # change the index same with `nodes`
+            # change the index the same as `nodes`
             for i, node in enumerate(df.index.values):
                 if node.startswith("create_dir_") or node.startswith("cleanup_"):
                     new_name = node.split("-")[0]
@@ -215,8 +214,8 @@ class PSD_Dataset(InMemoryDataset):
             # v_max = all_feat.max(axis=1, keepdims=True)
             v_min = np.concatenate(all_feat).min(axis=0)
             v_max = np.concatenate(all_feat).max(axis=0)
-            norm_feat = (all_feat - v_min) / (v_max - v_min)
-            np.nan_to_num(norm_feat, 0)
+            norm_feat = (all_feat - v_min) / (v_max - v_min) + 0
+            np.nan_to_num(norm_feat, False)
             for i, x in enumerate(norm_feat):
                 data_list[i].x = torch.tensor(x, dtype=torch.float32)
 

@@ -41,6 +41,18 @@ def process_args():
                         type=int,
                         default=500,
                         help="Number of epoch in training.")
+    parser.add_argument("--hidden_size",
+                        type=int,
+                        default=64,
+                        help="Hidden channel size.")
+    parser.add_argument("--batch_size",
+                        type=int,
+                        default=32,
+                        help="Batch size.")
+    parser.add_argument("--train_size",
+                        type=float,
+                        default=0.6,
+                        help="Train size [0.5, 1). And equal split on validation and testing.")
     parser.add_argument("--lr",
                         type=float,
                         default=1e-3,
@@ -53,16 +65,22 @@ def process_args():
                         type=str,
                         default=".",
                         help="Specify the root path of file.")
+    parser.add_argument("--force",
+                        action="store_true",
+                        help="To force reprocess datasets.")
     parser.add_argument("--verbose", "-v",
                         action="store_true",
                         help="Toggle for verbose output.")
     parser.add_argument("--output", "-o",
                         action="store_true",
                         help="Toggle for pickle output file.")
-    parser.add_argument("--anomaly", "-a",
+    parser.add_argument("--anomaly_cat",
                         type=str,
                         default="all",
                         help="Specify the anomaly set.")
+    parser.add_argument("--anomaly_level",
+                        nargs="*",
+                        help="Specify the anomaly levels. Multiple inputs.")
     args = vars(parser.parse_args())
 
     return args

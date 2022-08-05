@@ -51,36 +51,42 @@ if __name__ == "__main__":
         random.seed(args['seed'])
         torch.manual_seed(args['seed'])
         np.random.seed(args['seed'])
-        
-    DEVICE = torch.device(f"cuda:{args['gpu']}") if torch.cuda.is_available() else "cpu"
+
+    if args['gpu'] == -1:
+        DEVICE = torch.device("cpu")
+    else:
+        DEVICE = torch.device(f"cuda:{args['gpu']}") if torch.cuda.is_available() else "cpu"
 
     if args['workflow'] == "all":
         dataset = Merge_PSD_Dataset(node_level=False, binary_labels=args['binary']).shuffle()
     else:
         dataset = PSD_Dataset("./", args['workflow'],
-                              force_reprocess=False,
+                              force_reprocess=True,
                               node_level=False,
-                              binary_labels=args['binary']).shuffle()
+                              binary_labels=args['binary'],
+                              anomaly_cat=args['anomaly_cat'],
+                              anomaly_level=args['anomaly_level']
+                              ).shuffle()
 
     n_graphs = len(dataset)
     y = dataset.data.y.numpy()
-    train_idx, test_idx = train_test_split(np.arange(n_graphs), train_size=0.6, random_state=0, shuffle=True)
+    train_idx, test_idx = train_test_split(np.arange(n_graphs), train_size=args['train_size'], random_state=0, shuffle=True)
     val_idx, test_idx = train_test_split(test_idx, test_size=0.5, random_state=0, shuffle=True)
 
-    train_loader = DataLoader(dataset[train_idx], batch_size=32)
-    val_loader = DataLoader(dataset[val_idx], batch_size=32)
-    test_loader = DataLoader(dataset[test_idx], batch_size=32)
+    train_loader = DataLoader(dataset[train_idx], batch_size=args['batch_size'])
+    val_loader = DataLoader(dataset[val_idx], batch_size=args['batch_size'])
+    test_loader = DataLoader(dataset[test_idx], batch_size=args['batch_size'])
 
     NUM_NODE_FEATURES = dataset.num_node_features
     NUM_OUT_FEATURES = dataset.num_classes
 
     ''' Build GNN model '''
-    model = GNN(NUM_NODE_FEATURES, 64, NUM_OUT_FEATURES).to(DEVICE)
+    model = GNN(NUM_NODE_FEATURES, args['hidden_size'], NUM_OUT_FEATURES).to(DEVICE)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args['lr'])
     loss_func = CrossEntropyLoss()
 
-    pbar = tqdm(range(args['epoch']))
+    pbar = tqdm(range(args['epoch']), desc=f"{args['workflow']}")
     for e in pbar:
         model.train()
         optimizer.zero_grad()
@@ -112,7 +118,7 @@ if __name__ == "__main__":
         f1_val = f1_score(y_true, y_pred, average="weighted")
         recall_val = recall_score(y_true, y_pred, average="weighted")
 
-    print("graph level clf",
+    print("graph level clf:",
           f"workflow {args['workflow']}",
           f"binary {args['binary']}",
           f"test acc {test_acc:.4f}",

@@ -27,21 +27,27 @@ if __name__ == "__main__":
 
     args = process_args()
 
-    DEVICE = torch.device(f"cuda:{args['gpu']}") if torch.cuda.is_available() else "cpu"
+    if args['seed'] != -1:
+        torch.manual_seed(args['seed'])
+        np.random.seed(args['seed'])
+        random.seed(args['seed'])
 
-    # DATA = PSD_Dataset_v2 if args['old_data'] else PSD_Dataset
-    # MODEL = GNN_v2 if args['old_model'] else GNN
-    BINARY = True if args['binary'] else False
+    if args['gpu'] == -1:
+        DEVICE = torch.device("cpu")
+    else:
+        DEVICE = torch.device(f"cuda:{args['gpu']}") if torch.cuda.is_available() else "cpu"
 
     if args['workflow'] == "all":
         dataset = Merge_PSD_Dataset(node_level=True, binary_labels=args['binary'])
     else:
         dataset = PSD_Dataset("./", args['workflow'],
-                              force_reprocess=False,
+                              force_reprocess=args['force'],
                               node_level=True,
-                              binary_labels=args['binary'])
-    # filename = f"processed/1000genome/{'PSD_Dataset_v2' if args['old_data'] else 'PSD_Dataset'}_binary_{BINARY}_node_True.pt"
-    # dataset, _ = torch.load(filename)
+                              binary_labels=args['binary'],
+                              anomaly_cat=args['anomaly_cat'],
+                              anomaly_level=args['anomaly_level'],
+                              )
+
     data = dataset[0]
     n_nodes = data.num_nodes
 
@@ -49,15 +55,14 @@ if __name__ == "__main__":
     NUM_OUT_FEATURES = dataset.num_classes
 
     ''' Build GNN model '''
-    # model = GNN(NUM_NODE_FEATURES, 0, 64, NUM_OUT_FEATURES, 1).to(DEVICE)
-    model = GNN(NUM_NODE_FEATURES, 64, NUM_OUT_FEATURES).to(DEVICE)
-    # print(model)
+    model = GNN(NUM_NODE_FEATURES, args['hidden_size'], NUM_OUT_FEATURES).to(DEVICE)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args['lr'])
     loss_func = CrossEntropyLoss()
 
     data = data.to(DEVICE)
-    for e in range(args['epoch']):
+    pbar = tqdm(range(args['epoch']))
+    for e in pbar:
         model.train()
         optimizer.zero_grad()
         y_hat = model(data.x, data.edge_index)
@@ -87,7 +92,7 @@ if __name__ == "__main__":
         test_f1 = f1_score(y_true, y_pred)
         test_recall = recall_score(y_true, y_pred)
     else:
-        # TODO: add confusion matrix
+        conf_mat = confusion_matrix(y_true, y_pred)
         test_prec = precision_score(y_true, y_pred, average="weighted")
         test_f1 = f1_score(y_true, y_pred, average="weighted")
         test_recall = recall_score(y_true, y_pred, average="weighted")

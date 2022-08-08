@@ -19,10 +19,6 @@ from torch_geometric.data import Batch, Data, InMemoryDataset
 from psd_gnn.utils import create_dir, parse_adj
 import random
 
-random.seed(0)
-torch.manual_seed(0)
-np.random.seed(0)
-
 
 class PSD_Dataset(InMemoryDataset):
     """ New normalizing process """
@@ -54,6 +50,7 @@ class PSD_Dataset(InMemoryDataset):
             pre_transform (callable, optional): Pre_transform function. Defaults to None.
             pre_filter (callable, optional): Pre filter function. Defaults to None.
         """
+        self.root = root
         self.name = name.lower()
         self.use_node_attr = use_node_attr
         self.use_edge_attr = use_edge_attr
@@ -65,7 +62,7 @@ class PSD_Dataset(InMemoryDataset):
         self.anomaly_level = anomaly_level
 
         if self.force_reprocess:
-            SAVED_PATH = osp.join(osp.abspath(root), "processed", self.name)
+            SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
             SAVED_FILE = f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pt'
             SAVED_FILE2 = f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pkl'
             if osp.exists(SAVED_FILE):
@@ -131,57 +128,61 @@ class PSD_Dataset(InMemoryDataset):
              'kickstart_status', 'kickstart_executables_exitcode']
         data_list = []
         feat_list = []
-        n = len(nodes)
-        for filename in glob.glob(f"{data_folder}/*/{self.name.replace('_', ' - ')}*.csv"):
-            # process labels according to classes
-            if self.binary_labels:
-                if "normal" in filename:
-                    y = torch.tensor([0]) if not self.node_level else torch.tensor([0] * n)
-                else:
-                    y = torch.tensor([1]) if not self.node_level else torch.tensor([1] * n)
+
+        if self.anomaly_cat == "all":
+            self.y_labels = ["normal", "cpu", "hdd", "loss"]
+        else:
+            if self.anomaly_level is None:
+                self.y_labels = ["normal", self.anomaly_cat]
             else:
-                if "normal" in filename:
-                    y = torch.tensor([0]) if not self.node_level else torch.tensor([0] * n)
-                elif "cpu" in filename:
-                    y = torch.tensor([1]) if not self.node_level else torch.tensor([1] * n)
-                elif "hdd" in filename:
-                    y = torch.tensor([2]) if not self.node_level else torch.tensor([2] * n)
-                elif "loss" in filename:
-                    y = torch.tensor([3]) if not self.node_level else torch.tensor([3] * n)
+                self.y_labels = ["normal"] + [f"{self.anomaly_cat}_{level}" for level in self.anomaly_level]
 
-            df = pd.read_csv(filename, index_col=[0])
+        for y_idx, y_label in enumerate(self.y_labels):
+            raw_data_files = f"{data_folder}/{y_label}*/{self.name.replace('_', ' - ')}*.csv"
+            assert len(glob.glob(raw_data_files)) > 0, f"Incorrect anomaly cat and level {y_label}"
 
-            # handle missing features
-            if "kickstart_executables_cpu_time" not in df.columns:
-                continue
-            # handle the nowind workflow
-            if df.shape[0] != len(nodes):
-                continue
+            for fn in glob.glob(raw_data_files):
+                if self.binary_labels:
+                    if "normal" in fn:
+                        y = [0] * self.num_nodes_per_graph if self.node_level else [0]
+                    else:
+                        y = [1] * self.num_nodes_per_graph if self.node_level else [1]
+                else:
+                    y = [y_idx] * self.num_nodes_per_graph if self.node_level else [y_idx]
+                y = torch.tensor(y)
 
-            # convert type to dummy features
-            df = pd.concat([pd.get_dummies(df.type), df], axis=1)
-            df = df.drop(["type"], axis=1)
-            df = df[self.features]
-            df = df.fillna(0)
+                df = pd.read_csv(fn, index_col=[0])
+                # handle missing features
+                if "kickstart_executables_cpu_time" not in df.columns:
+                    continue
+                # handle the nowind workflow
+                if df.shape[0] != len(nodes):
+                    continue
 
-            # shift timestamps
-            ts_anchor = df['ready'].min()
-            for attr in ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']:
-                df[attr] -= ts_anchor
+                # convert type to dummy features
+                df = pd.concat([pd.get_dummies(df.type), df], axis=1)
+                df = df.drop(["type"], axis=1)
+                df = df[self.features]
+                df = df.fillna(0)
 
-            # change the index the same as `nodes`
-            for i, node in enumerate(df.index.values):
-                if node.startswith("create_dir_") or node.startswith("cleanup_"):
-                    new_name = node.split("-")[0]
-                    df.index.values[i] = new_name
+                # shift timestamps
+                ts_anchor = df['ready'].min()
+                for attr in ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']:
+                    df[attr] -= ts_anchor
 
-            # sort node name in json matches with node in csv.
-            df = df.iloc[df.index.map(nodes).argsort()]
+                # change the index the same as `nodes`
+                for i, node in enumerate(df.index.values):
+                    if node.startswith("create_dir_") or node.startswith("cleanup_"):
+                        new_name = node.split("-")[0]
+                        df.index.values[i] = new_name
 
-            x = torch.tensor(df.to_numpy(), dtype=torch.float32)
-            feat_list.append(df.to_numpy())
-            data = Data(x=x, edge_index=edge_index, y=y)
-            data_list.append(data)
+                # sort node name in json matches with node in csv.
+                df = df.iloc[df.index.map(nodes).argsort()]
+
+                x = torch.tensor(df.to_numpy(), dtype=torch.float32)
+                feat_list.append(df.to_numpy())
+                data = Data(x=x, edge_index=edge_index, y=y)
+                data_list.append(data)
 
         # normalize across jobs
         # backend: numpy
@@ -197,6 +198,7 @@ class PSD_Dataset(InMemoryDataset):
                 data_list[i].x = torch.tensor(x, dtype=torch.float32)
 
         pickle.dump(data_list, open(self.processed_file_names[1], "wb"))
+
         # backend: pytorch
         # if self.normalize:
         #     all_feat = torch.stack(feat_list)
@@ -215,10 +217,14 @@ class PSD_Dataset(InMemoryDataset):
 
             # NOTE: split the dataset into train/val/test as 60/20/20
             idx = np.arange(data.num_nodes)
-            train_idx, test_idx = train_test_split(
-                idx, train_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
-            val_idx, test_idx = train_test_split(
-                test_idx, train_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[test_idx])
+
+            # train_idx, test_idx = train_test_split(
+            #     idx, train_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
+            # val_idx, test_idx = train_test_split(
+            #     test_idx, train_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[test_idx])
+
+            train_idx, test_idx = train_test_split(idx, train_size=0.6, random_state=0, shuffle=True)
+            val_idx, test_idx = train_test_split(test_idx, train_size=0.5, random_state=0, shuffle=True)
 
             data.train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
             data.train_mask[train_idx] = 1
@@ -232,7 +238,6 @@ class PSD_Dataset(InMemoryDataset):
         else:
             data, slices = self.collate(data_list)
             torch.save((data, slices), self.processed_paths[0])
-            # TODO: add data_loader to the fixed split of dataset
 
     def __repr__(self):
         return f'{self.name}({len(self)}) node_level {self.node_level} binary_labels {self.binary_labels}'

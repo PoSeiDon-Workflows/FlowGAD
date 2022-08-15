@@ -1,13 +1,13 @@
-
+""" Example of graph classification problem """
 import random
 
 import numpy as np
 import torch
 from psd_gnn.dataset import Merge_PSD_Dataset, PSD_Dataset
-from psd_gnn.models.graph_classifier import GNN, GNN_v2
+from psd_gnn.models.graph_classifier import GNN
 from psd_gnn.utils import process_args
-from sklearn.metrics import (accuracy_score, f1_score, precision_score,
-                             recall_score)
+from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
+                             precision_score, recall_score)
 from sklearn.model_selection import train_test_split
 from torch.nn import CrossEntropyLoss
 from torch_geometric.loader import DataLoader
@@ -15,7 +15,15 @@ from tqdm import tqdm
 
 
 def train(model, loader):
+    """ Train function
 
+    Args:
+        model (object): GNN model instance.
+        loader (pyg.loader.DataLoader): Data loader object.
+
+    Returns:
+        float: Training accuracy.
+    """
     model.train()
     total_loss = 0
     for data in loader:
@@ -31,6 +39,15 @@ def train(model, loader):
 
 @torch.no_grad()
 def test(model, loader):
+    """ Evaluation function
+
+    Args:
+        model (object): GNN model instance.
+        loader (pyg.loader.DataLoader): Data loader object.
+
+    Returns:
+        tuple (float, list): Testing accuracy, predicted labels.
+    """
     model.eval()
 
     total_correct = 0
@@ -61,7 +78,7 @@ if __name__ == "__main__":
         dataset = Merge_PSD_Dataset(node_level=False, binary_labels=args['binary']).shuffle()
     else:
         dataset = PSD_Dataset("./", args['workflow'],
-                              force_reprocess=True,
+                              force_reprocess=args['force'],
                               node_level=False,
                               binary_labels=args['binary'],
                               anomaly_cat=args['anomaly_cat'],
@@ -114,6 +131,7 @@ if __name__ == "__main__":
         f1_val = f1_score(y_true, y_pred)
         recall_val = recall_score(y_true, y_pred)
     else:
+        conf_mat = confusion_matrix(y_true, y_pred)
         prec_val = precision_score(y_true, y_pred, average="weighted")
         f1_val = f1_score(y_true, y_pred, average="weighted")
         recall_val = recall_score(y_true, y_pred, average="weighted")

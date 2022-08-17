@@ -1,12 +1,12 @@
 import glob
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from psd_gnn.dataset import PSD_Dataset
-from psd_gnn.utils import create_dir, process_args
-import os
 from tqdm import tqdm
+
+from psd_gnn.utils import create_dir, process_args
 
 # NOTE: `finished` is the new column
 columns = ["ready", "wms_delay", "pre_script_delay",
@@ -16,6 +16,7 @@ columns = ["ready", "wms_delay", "pre_script_delay",
 colors = ["#ea4335", "#fbbc03", "#33a853",
           "#740264", "#000000", "#4cd195",
           "#4285f4", "#ea8023", "#5f6368"]
+
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == "__main__":
@@ -24,9 +25,9 @@ if __name__ == "__main__":
     # if not os.path.exists("gantt_chats"):
     #     os.mkdir()
     create_dir(os.path.join(CUR_DIR, "gantt_chats"))
-    
+
     raw_files = glob.glob(f"./data/*/{args['workflow']}*.csv")
-    
+
     for fn in tqdm(raw_files):
         folder = fn.split("/")[2]
         cur_folder = os.path.join(CUR_DIR, "gantt_chats", folder)
@@ -56,4 +57,3 @@ if __name__ == "__main__":
 
         plt.savefig(os.path.join(cur_folder, f"{''.join(fn.split('/')[-1].split('.')[:-1])}.png"))
         plt.close()
-    

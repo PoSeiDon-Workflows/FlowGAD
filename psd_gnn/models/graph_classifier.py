@@ -3,12 +3,14 @@
 
 License: TBD
 """
+
 import torch
 import torch.nn.functional as F
-from torch.nn import Linear, Module, ReLU, ModuleList, Sequential
-from torch_geometric.nn import GraphConv, TopKPooling, SAGEConv, GCNConv
-from torch_geometric.nn import global_max_pool as gmp
+from torch.nn import Linear, ModuleList, ReLU, Sequential
+from torch_geometric.nn import GCNConv
 from torch_geometric.nn import global_mean_pool as gap
+
+torch.manual_seed(0)
 
 
 class GNN(torch.nn.Module):
@@ -78,33 +80,3 @@ class GNN(torch.nn.Module):
 
         # return the output
         return F.log_softmax(out, dim=1)
-
-
-class GNN_v2(Module):
-    """ A GraphSage based model (old version) """
-
-    def __init__(self, in_channels, hidden_channels, out_channels, dropout=0.07):
-        super(GNN_v2, self).__init__()
-        torch.manual_seed(12345)
-        self.conv1 = SAGEConv(in_channels, hidden_channels)
-        self.conv2 = SAGEConv(hidden_channels, hidden_channels)
-        self.conv3 = SAGEConv(hidden_channels, hidden_channels)
-        self.lin = Linear(hidden_channels, out_channels)
-        self.dropout = dropout
-
-    def forward(self, x, edge_index, batch):
-        # 1. Obtain node embeddings
-        x = self.conv1(x, edge_index)
-        x = x.relu()
-        x = self.conv2(x, edge_index)
-        x = x.relu()
-        x = self.conv3(x, edge_index)
-
-        # 2. Readout layer
-        x = gap(x, batch)
-
-        # 3. Apply a final classifier
-        x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.lin(x)
-        x = F.log_softmax(x, dim=1)
-        return x

@@ -21,6 +21,7 @@ def process_args():
                  "nowcast-clustering-16",
                  "wind-clustering-casa",
                  "wind-noclustering-casa",
+                 "1000genome_new_2022",
                  "all"
                  ]
 
@@ -65,6 +66,10 @@ def process_args():
                         type=str,
                         default=".",
                         help="Specify the root path of file.")
+    parser.add_argument("--logdir",
+                        type=str,
+                        default="runs",
+                        help="Specify the log directory.")
     parser.add_argument("--force",
                         action="store_true",
                         help="To force reprocess datasets.")
@@ -127,6 +132,26 @@ def parse_adj(workflow):
             edges.append((nodes[u], nodes[v]))
 
     return nodes, edges
+
+
+def print_dataset_info(dataset):
+    """ Print the dataset information.
+
+    Args:
+        dataset (PyG.dataset): Dataset object.
+    """
+    print(dataset)
+    print(f"dataset                 {dataset.name} \n",
+          f"# of graphs             {len(dataset)} \n",
+          f"# of graph labels       {dataset.num_classes} \n",
+          f"# of node labels        {dataset.num_node_labels} \n",
+          f"# of node features      {dataset.num_node_features} \n",
+          f"# of nodes per graph    {dataset[0].num_nodes} \n",
+          f"# of edges per graph    {dataset[0].num_edges} \n",
+          "##" * 20 + "\n"
+          )
+
+
 def create_dir(path):
     """ Create a dir where the processed data will be stored
 
@@ -257,3 +282,154 @@ def parse_data(flag, json_path, classes):
                 except BaseException:
                     print("Error with the file's {} format.".format(f))
     return graphs
+
+
+def init_model(args):
+    """ Init model for PyGOD
+
+    Args:
+        args (dict): Args from argparser.
+
+    Returns:
+        object: Model object.
+    """
+    from random import choice
+    from pygod.models import AdONE, AnomalyDAE, CONAD, DOMINANT, DONE, GAAN, GCNAE, GUIDE, MLPAE, Radar, ANOMALOUS, SCAN
+    from pyod.models.lof import LOF
+    from sklearn.ensemble import IsolationForest
+    if not isinstance(args, dict):
+        args = vars(args)
+    dropout = [0, 0.1, 0.3]
+    lr = [0.1, 0.05, 0.01]
+    weight_decay = 0.01
+
+    if args['dataset'] == 'inj_flickr':
+        # sampling and minibatch training on large dataset flickr
+        batch_size = 64
+        num_neigh = 3
+        epoch = 2
+    else:
+        batch_size = 0
+        num_neigh = -1
+        epoch = 300
+
+    model_name = args['model']
+    gpu = args['gpu']
+
+    # if hasattr(args, 'epoch'):
+    epoch = args.get('epoch', 200)
+
+    if args['dataset'] == 'reddit':
+        # for the low feature dimension dataset
+        hid_dim = [32, 48, 64]
+    else:
+        hid_dim = [32, 64, 128, 256]
+
+    if args['dataset'][:3] == 'inj':
+        # auto balancing on injected dataset
+        alpha = [None]
+    else:
+        alpha = [0.8, 0.5, 0.2]
+
+    if model_name == "adone":
+        return AdONE(hid_dim=choice(hid_dim),
+                     weight_decay=weight_decay,
+                     dropout=choice(dropout),
+                     lr=choice(lr),
+                     epoch=epoch,
+                     gpu=gpu,
+                     batch_size=batch_size,
+                     num_neigh=num_neigh)
+    elif model_name == 'anomalydae':
+        hd = choice(hid_dim)
+        return AnomalyDAE(embed_dim=hd,
+                          out_dim=hd,
+                          weight_decay=weight_decay,
+                          dropout=choice(dropout),
+                          theta=choice([10., 40., 90.]),
+                          eta=choice([3., 5., 8.]),
+                          lr=choice(lr),
+                          epoch=epoch,
+                          gpu=gpu,
+                          alpha=choice(alpha),
+                          batch_size=batch_size,
+                          num_neigh=num_neigh)
+    elif model_name == 'conad':
+        return CONAD(hid_dim=choice(hid_dim),
+                     weight_decay=weight_decay,
+                     dropout=choice(dropout),
+                     lr=choice(lr),
+                     epoch=epoch,
+                     gpu=gpu,
+                     alpha=choice(alpha),
+                     batch_size=batch_size,
+                     num_neigh=num_neigh)
+    elif model_name == 'dominant':
+        return DOMINANT(hid_dim=choice(hid_dim),
+                        weight_decay=weight_decay,
+                        dropout=choice(dropout),
+                        lr=choice(lr),
+                        epoch=epoch,
+                        gpu=gpu,
+                        alpha=choice(alpha),
+                        batch_size=batch_size,
+                        num_neigh=num_neigh)
+    elif model_name == 'done':
+        return DONE(hid_dim=choice(hid_dim),
+                    weight_decay=weight_decay,
+                    dropout=choice(dropout),
+                    lr=choice(lr),
+                    epoch=epoch,
+                    gpu=gpu,
+                    batch_size=batch_size,
+                    num_neigh=num_neigh)
+    elif model_name == 'gaan':
+        return GAAN(noise_dim=choice([8, 16, 32]),
+                    hid_dim=choice(hid_dim),
+                    weight_decay=weight_decay,
+                    dropout=choice(dropout),
+                    lr=choice(lr),
+                    epoch=epoch,
+                    gpu=gpu,
+                    alpha=choice(alpha),
+                    batch_size=batch_size,
+                    num_neigh=num_neigh)
+    elif model_name == 'gcnae':
+        return GCNAE(hid_dim=choice(hid_dim),
+                     weight_decay=weight_decay,
+                     dropout=choice(dropout),
+                     lr=choice(lr),
+                     epoch=epoch,
+                     gpu=gpu,
+                     batch_size=batch_size,
+                     num_neigh=num_neigh)
+    elif model_name == 'guide':
+        return GUIDE(a_hid=choice(hid_dim),
+                     s_hid=choice([4, 5, 6]),
+                     weight_decay=weight_decay,
+                     dropout=choice(dropout),
+                     lr=choice(lr),
+                     epoch=epoch,
+                     gpu=gpu,
+                     alpha=choice(alpha),
+                     batch_size=batch_size,
+                     num_neigh=num_neigh,
+                     cache_dir='./tmp')
+    elif model_name == "mlpae":
+        return MLPAE(hid_dim=choice(hid_dim),
+                     weight_decay=weight_decay,
+                     dropout=choice(dropout),
+                     lr=choice(lr),
+                     epoch=epoch,
+                     gpu=gpu,
+                     batch_size=batch_size)
+    elif model_name == 'lof':
+        return LOF()
+    elif model_name == 'if':
+        return IsolationForest()
+    elif model_name == 'radar':
+        return Radar(lr=choice(lr), gpu=gpu)
+    elif model_name == 'anomalous':
+        return ANOMALOUS(lr=choice(lr), gpu=gpu)
+    elif model_name == 'scan':
+        return SCAN(eps=choice([0.3, 0.5, 0.8]), mu=choice([2, 5, 10]))

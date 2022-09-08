@@ -4,7 +4,7 @@ import numpy as np
 import random
 import torch
 from psd_gnn.dataset import Merge_PSD_Dataset, PSD_Dataset
-from psd_gnn.models.node_classifier import GNN, GNN_v2
+from psd_gnn.models.node_classifier import GNN
 from psd_gnn.utils import process_args
 from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score, precision_score,
                              recall_score)

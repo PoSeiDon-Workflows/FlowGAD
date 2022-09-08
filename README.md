@@ -25,15 +25,18 @@ graphs stat
 ## Running examples
 
 * graph-level anomaly classification
+
   `python example/demo_graph_classification.py`
 
 * node-level anomaly classification
+
   `python example/demo_node_classification.py`
 
 ## Options
 
+`python examples/demo_graph_classification.py --help`
+
 ```bash
-python examples/demo_graph_classification.py --help
 usage: demo_graph_classification.py [-h] [--workflow {1000genome,nowcast-clustering-8,nowcast-clustering-16,wind-clustering-casa,wind-noclustering-casa,all}] [--binary] [--gpu GPU]
                                     [--epoch EPOCH] [--hidden_size HIDDEN_SIZE] [--batch_size BATCH_SIZE] [--train_size TRAIN_SIZE] [--lr LR] [--seed SEED] [--path PATH] [--logdir LOGDIR] [--force]
                                     [--verbose] [--output] [--anomaly_cat ANOMALY_CAT] [--anomaly_level [ANOMALY_LEVEL [ANOMALY_LEVEL ...]]]
@@ -63,3 +66,5 @@ optional arguments:
   --anomaly_level [ANOMALY_LEVEL [ANOMALY_LEVEL ...]]
                         Specify the anomaly levels. Multiple inputs.
 ```
+
+* `workflow=all` is the setting to train all workflows together.

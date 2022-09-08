@@ -17,7 +17,6 @@ from sklearn.model_selection import train_test_split
 from torch_geometric.data import Batch, Data, InMemoryDataset
 
 from psd_gnn.utils import create_dir, parse_adj
-import random
 
 
 class PSD_Dataset(InMemoryDataset):

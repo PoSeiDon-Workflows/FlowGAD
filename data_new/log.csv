@@ -1,6 +1,0 @@
-'startTime','endTime','anomaly','anomalyWorkers'
-'1659744770','1659744771','normal','worker2-container-28-31,worker1-container-8-11,worker2-container-8-11,worker2-container-4-7,worker1-container-28-31'
-'1659981270','1659981271','cpu_2','worker2-container-24-27,worker1-container-20-23,worker1-container-4-7,worker2-container-8-11,worker2-container-4-7'
-'1660057115','1660057116','hdd_10','worker2-container-0-3,worker1-container-16-19,worker1-container-28-31,worker1-container-32-35,worker1-container-12-15'
-'1660895051','1660895052','hdd_5','worker1-container-8-11,worker2-container-12-15,worker2-container-36-39,worker2-container-32-35,worker1-container-12-15'
-'1661002527','1661002528','cpu_3','worker1-container-20-23,worker1-container-28-31,worker1-container-36-39,worker2-container-28-31,worker1-container-4-7'

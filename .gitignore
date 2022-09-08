@@ -1,5 +1,13 @@
-.ipynb_checkpoints
-*/__pycache__/
-**/*.pyc
+**/_draft/**
+**/.ipynb_checkpoints/*
+**/.vscode/**
 **/*.pkl
+**/*.pyc
+**/adjacency_list_dags/**
+**/data/**
+**/gantt_chats/**
 **/processed/
+**/psd_gnn.egg-info/**
+**/results/**
+**/runs/**
+*/__pycache__/

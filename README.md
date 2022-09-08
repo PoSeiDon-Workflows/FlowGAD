@@ -1,17 +1,5 @@
 # Graph Neural Network for Anomaly Detection and Classification in Scientific Workflows
 
-## Repo Content
-
-- **adjacency_list_dags**: json files with dependencies between nodes in each workflow
-- **data**: raw data - characterizations of jobs in each workflow during multiple execustions
-- **deepHyp_scripts**: scripts connected to finding best hyperparameters for GNN
-- **helpers**: helper scripts that include functions and class definitions (models)
-- **notebooks**: notebooks used during the code development
-- **pickles**: pickle data from previous experiments (processsed raw data)
-- **preprocess_graph_data**: pickles with workflow data in format expected by PyG
-- **results**: csv files with results
-- **submission_scripts**: bash scripts for jobs submissions
-
 ## setup env
 
 * Install with CUDA available (default)
@@ -22,63 +10,56 @@
 
   `sh setup.sh cpu`
 
-### Step 0 : ETA
 
-- visualize the graphs
-- feature analysis
-
-### Step 1: Preprocess the data
-
-```python3
-python3 preprocess_data.py --workflow_type all
-```
+## Data Statistics
 
 graphs stat
-|                        | cpu samples | hdd samples | loss samples | normal samples | # of nodes | # of edges |
-| :--------------------- | :---------: | :---------: | :----------: | :------------: | ---------: | ---------: |
-| 1000gemome             |     250     |     575     |     250      |      200       |         57 |        129 |
-| nowcast-clustering-8   |     300     |     360     |     300      |      270       |         13 |         20 |
-| nowcast-clustering-16  |     300     |     360     |     300      |      270       |          9 |         12 |
-| wind-clustering-casa   |     300     |     360     |     300      |      270       |          7 |          8 |
-| wind-noclustering-casa |     300     |     360     |     300      |      270       |         26 |         44 |
+|                        | # of nodes | # of edges | cpu samples | hdd samples | loss samples | normal samples |
+| :--------------------- | :--------: | :--------: | :---------: | :---------: | :----------: | :------------: |
+| 1000gemome             |     57     |    129     |     250     |     575     |     250      |      200       |
+| nowcast-clustering-8   |     13     |     20     |     300     |     360     |     300      |      270       |
+| nowcast-clustering-16  |     9      |     12     |     300     |     360     |     300      |      270       |
+| wind-clustering-casa   |     7      |     8      |     300     |     360     |     300      |      270       |
+| wind-noclustering-casa |     26     |     44     |     300     |     360     |     300      |      270       |
 
-Comment: raw data includes a number of invalid files from wind-nonclustering-casa_wind_wf experiment: 20200817T052029Z
+## Running examples
 
-The script usage:
+* graph-level anomaly classification
+  `python example/demo_graph_classification.py`
 
-```text
-usage: preprocess_data.py [-h] [--workflow_type WORKFLOW_TYPE]
+* node-level anomaly classification
+  `python example/demo_node_classification.py`
 
-Data preprocessing for GNN
+## Options
 
-options:
+```bash
+python examples/demo_graph_classification.py --help
+usage: demo_graph_classification.py [-h] [--workflow {1000genome,nowcast-clustering-8,nowcast-clustering-16,wind-clustering-casa,wind-noclustering-casa,all}] [--binary] [--gpu GPU]
+                                    [--epoch EPOCH] [--hidden_size HIDDEN_SIZE] [--batch_size BATCH_SIZE] [--train_size TRAIN_SIZE] [--lr LR] [--seed SEED] [--path PATH] [--logdir LOGDIR] [--force]
+                                    [--verbose] [--output] [--anomaly_cat ANOMALY_CAT] [--anomaly_level [ANOMALY_LEVEL [ANOMALY_LEVEL ...]]]
+
+optional arguments:
   -h, --help            show this help message and exit
-  --workflow_type WORKFLOW_TYPE
-                        name of a workflow: nowcast-clustering-16,1000genome,nowcast-
-                        clustering-8,wind-clustering-casa,wind-noclustering-casa or ALL 
-
+  --workflow {1000genome,nowcast-clustering-8,nowcast-clustering-16,wind-clustering-casa,wind-noclustering-casa,1000genome_new_2022,all}, -w {1000genome,nowcast-clustering-8,nowcast-clustering-16,wind-clustering-casa,wind-noclustering-casa,1000genome_new_2022,all}
+                        Name of workflow.
+  --binary              Toggle binary classification.
+  --gpu GPU             GPU id. `-1` for CPU only.
+  --epoch EPOCH         Number of epoch in training.
+  --hidden_size HIDDEN_SIZE
+                        Hidden channel size.
+  --batch_size BATCH_SIZE
+                        Batch size.
+  --train_size TRAIN_SIZE
+                        Train size [0.5, 1). And equal split on validation and testing.
+  --lr LR               Learning rate.
+  --seed SEED           Fix the random seed. `-1` for no random seed.
+  --path PATH, -p PATH  Specify the root path of file.
+  --logdir LOGDIR       Specify the log directory.
+  --force               To force reprocess datasets.
+  --verbose, -v         Toggle for verbose output.
+  --output, -o          Toggle for pickle output file.
+  --anomaly_cat ANOMALY_CAT
+                        Specify the anomaly set.
+  --anomaly_level [ANOMALY_LEVEL [ANOMALY_LEVEL ...]]
+                        Specify the anomaly levels. Multiple inputs.
 ```
-
-Output:
-
-### Step 2: Train a model
-
-```python3
-python3 train_model.py --workflow_type all
-```
-
-The script usage:
-
-```
-usage: 
-
-```
-
-Output:
-
-
-
-## Data description
-| workflow   | # nodes per graph | # edges per graph |
-| ---------- | ----------------- | ----------------- |
-| 1000genome | 57                | 129               |

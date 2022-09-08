@@ -6,21 +6,11 @@ import torch
 from psd_gnn.dataset import Merge_PSD_Dataset, PSD_Dataset
 from psd_gnn.models.node_classifier import GNN, GNN_v2
 from psd_gnn.utils import process_args
-from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score, precision_score,
                              recall_score)
 from torch.nn import CrossEntropyLoss
 
-torch.manual_seed(0)
-np.random.seed(0)
-random.seed(0)
-
-
-def train(model, data):
-    pass
-
-
-def test():
-    pass
+from tqdm import tqdm
 
 
 if __name__ == "__main__":

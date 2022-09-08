@@ -1,5 +1,7 @@
 """ Example of graph classification problem """
+import os.path as osp
 import random
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -10,6 +12,7 @@ from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
                              precision_score, recall_score)
 from sklearn.model_selection import train_test_split
 from torch.nn import CrossEntropyLoss
+from torch.utils.tensorboard import SummaryWriter
 from torch_geometric.loader import DataLoader
 from tqdm import tqdm
 
@@ -39,7 +42,7 @@ def train(model, loader):
 
 @torch.no_grad()
 def test(model, loader):
-    """ Evaluation function
+    """ Evaluation function.
 
     Args:
         model (object): GNN model instance.
@@ -87,7 +90,8 @@ if __name__ == "__main__":
 
     n_graphs = len(dataset)
     y = dataset.data.y.numpy()
-    train_idx, test_idx = train_test_split(np.arange(n_graphs), train_size=args['train_size'], random_state=0, shuffle=True)
+    train_idx, test_idx = train_test_split(
+        np.arange(n_graphs), train_size=args['train_size'], random_state=0, shuffle=True)
     val_idx, test_idx = train_test_split(test_idx, test_size=0.5, random_state=0, shuffle=True)
 
     train_loader = DataLoader(dataset[train_idx], batch_size=args['batch_size'])
@@ -103,7 +107,11 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=args['lr'])
     loss_func = CrossEntropyLoss()
 
+    ts_start = datetime.now().strftime('%Y%m%d_%H%M%S')
+    writer = SummaryWriter(log_dir=f"{args['logdir']}/{args['workflow']}_{ts_start}")
+
     pbar = tqdm(range(args['epoch']), desc=f"{args['workflow']}")
+    best = 0
     for e in pbar:
         model.train()
         optimizer.zero_grad()
@@ -113,12 +121,17 @@ if __name__ == "__main__":
 
         val_acc, _ = test(model, val_loader)
 
+        if val_acc > best:
+            torch.save(model, osp.join("saved_models"))
         if args['verbose']:
             print(f"epoch {e:03d}",
                   f"train loss {train_loss:.4f}",
                   f"train acc {train_acc:.4f}",
                   f"val acc {val_acc:.4f}",
                   )
+        writer.add_scalar("Loss", train_loss, e)
+        writer.add_scalars("Accuracy", {"training": train_acc, "validation": val_acc}, e)
+        # writer.add_scalar("Accuracy", train_acc, e)
 
     test_acc, y_pred = test(model, test_loader)
 
@@ -144,3 +157,10 @@ if __name__ == "__main__":
           f"recall {recall_val:.4f}",
           f"prec {prec_val:.4f}",
           )
+
+    writer.add_hparams(args, {'acc': test_acc,
+                              'f1': f1_val,
+                              'recall': recall_val,
+                              'prec': prec_val})
+    writer.flush()
+    writer.close()

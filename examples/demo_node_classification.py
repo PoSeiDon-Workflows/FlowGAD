@@ -1,31 +1,24 @@
 """ Demo of node classification """
 
+from pydoc import describe
 import numpy as np
 import random
 import torch
 from psd_gnn.dataset import Merge_PSD_Dataset, PSD_Dataset
-from psd_gnn.models.node_classifier import GNN, GNN_v2
+from psd_gnn.models.node_classifier import GNN
 from psd_gnn.utils import process_args
-from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score, precision_score,
                              recall_score)
 from torch.nn import CrossEntropyLoss
-
-torch.manual_seed(0)
-np.random.seed(0)
-random.seed(0)
-
-
-def train(model, data):
-    pass
-
-
-def test():
-    pass
-
+from datetime import datetime
+from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 
 if __name__ == "__main__":
 
     args = process_args()
+    if args["workflow"] == "1000genome_new_2022":
+        from psd_gnn.dataset_v2 import PSD_Dataset
 
     if args['seed'] != -1:
         torch.manual_seed(args['seed'])
@@ -60,8 +53,10 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=args['lr'])
     loss_func = CrossEntropyLoss()
 
+    ts_start = datetime.now().strftime('%Y%m%d_%H%M%S')
+    writer = SummaryWriter(log_dir=f"{args['logdir']}/{args['workflow']}_{ts_start}")
     data = data.to(DEVICE)
-    pbar = tqdm(range(args['epoch']))
+    pbar = tqdm(range(args['epoch']), desc=args['workflow'])
     for e in pbar:
         model.train()
         optimizer.zero_grad()
@@ -77,11 +72,17 @@ if __name__ == "__main__":
         optimizer.step()
 
         if args['verbose']:
-            print(f"epoch {e:03d}",
-                  f"train loss {train_loss:.4f}",
-                  f"train acc {train_acc:.4f}",
-                  f"val acc {val_acc:.4f}",
-                  )
+            pbar.set_postfix({"train_loss": train_loss.detach().cpu().item(),
+                             "train_acc": train_acc,
+                              "val_acc": val_acc})
+            # print(f"epoch {e:03d}",
+            #       f"train loss {train_loss:.4f}",
+            #       f"train acc {train_acc:.4f}",
+            #       f"val acc {val_acc:.4f}",
+            #       )
+        writer.add_scalar("Loss", train_loss, e)
+        writer.add_scalars("Accuracy", {"Training": train_acc,
+                                        "Validation": val_acc}, e)
     model.eval()
     y_out = model(data.x, data.edge_index)
     y_true = data.y[data.test_mask].detach().cpu().numpy()
@@ -102,6 +103,13 @@ if __name__ == "__main__":
           f"binary {args['binary']}",
           f"test acc {test_acc:.4f}",
           f"f1 {test_f1:.4f}",
-          f"recall {test_recall:.4f}"
+          f"recall {test_recall:.4f}",
           f"prec {test_prec:.4f}",
           )
+
+    # writer.add_hparams(args, {'acc': test_acc,
+    #                           'f1': test_f1,
+    #                           'recall': test_recall,
+    #                           'prec': test_prec})
+    writer.flush()
+    writer.close()

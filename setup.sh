@@ -25,6 +25,6 @@ else
 fi
 
 # pip install additional packages
-pip install deephyper pygod pyod class_resolver
+pip install deephyper pygod pyod class_resolver umap-learn
 
 python setup.py develop

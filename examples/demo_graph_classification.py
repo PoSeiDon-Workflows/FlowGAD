@@ -14,7 +14,7 @@ from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
 from sklearn.model_selection import train_test_split
 from torch.nn import CrossEntropyLoss
 from torch.utils.tensorboard import SummaryWriter
-from torch_geometric.loader import DataLoader
+from torch_geometric.loader import DataLoader, ImbalancedSampler, NeighborLoader
 from tqdm import tqdm
 
 
@@ -97,6 +97,14 @@ if __name__ == "__main__":
         np.arange(n_graphs), train_size=args['train_size'], random_state=0, shuffle=True)
     val_idx, test_idx = train_test_split(test_idx, test_size=0.5, random_state=0, shuffle=True)
 
+    # REVIEW: imbalanced sampler
+    # train_sampler = ImbalancedSampler(dataset[train_idx])
+    # val_sampler = ImbalancedSampler(val_idx)
+    # test_sampler = ImbalancedSampler(test_idx)
+    # train_loader = DataLoader(dataset[train_idx], batch_size=args['batch_size'], sampler=train_sampler)
+    # val_loader = DataLoader(dataset[val_idx], batch_size=args['batch_size'])
+    # test_loader = DataLoader(dataset[test_idx], batch_size=args['batch_size'])
+
     train_loader = DataLoader(dataset[train_idx], batch_size=args['batch_size'])
     val_loader = DataLoader(dataset[val_idx], batch_size=args['batch_size'])
     test_loader = DataLoader(dataset[test_idx], batch_size=args['batch_size'])
@@ -120,7 +128,7 @@ if __name__ == "__main__":
         optimizer.zero_grad()
         train_loss = train(model, train_loader)
 
-        train_acc, _ = test(model, train_loader)
+        train_acc, y_pred = test(model, train_loader)
 
         val_acc, _ = test(model, val_loader)
 
@@ -138,6 +146,12 @@ if __name__ == "__main__":
         writer.add_scalar("Loss", train_loss, e)
         writer.add_scalars("Accuracy", {"training": train_acc, "validation": val_acc}, e)
         # writer.add_scalar("Accuracy", train_acc, e)
+    ys = []
+    for data in train_loader:
+        # ys.append(data.y.item())
+        ys += data.y.detach().cpu().numpy().tolist()
+    y_true = ys
+    print(confusion_matrix(ys, y_pred))
 
     test_acc, y_pred = test(model, test_loader)
 
@@ -146,6 +160,7 @@ if __name__ == "__main__":
         y_true += data.y.detach().cpu().numpy().tolist()
 
     if args['binary']:
+        conf_mat = confusion_matrix(y_true, y_pred)
         prec_val = precision_score(y_true, y_pred)
         f1_val = f1_score(y_true, y_pred)
         recall_val = recall_score(y_true, y_pred)
@@ -163,7 +178,7 @@ if __name__ == "__main__":
           f"recall {recall_val:.4f}",
           f"prec {prec_val:.4f}",
           )
-
+    print(conf_mat)
     # writer.add_hparams(args, {'acc': test_acc,
     #                           'f1': f1_val,
     #                           'recall': recall_val,

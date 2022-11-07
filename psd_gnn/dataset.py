@@ -8,7 +8,6 @@ import os
 import os.path as osp
 import pickle
 
-import random
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -17,7 +16,6 @@ from sklearn.model_selection import train_test_split
 from torch_geometric.data import Batch, Data, InMemoryDataset
 
 from psd_gnn.utils import create_dir, parse_adj
-import random
 
 
 class PSD_Dataset(InMemoryDataset):
@@ -34,6 +32,7 @@ class PSD_Dataset(InMemoryDataset):
                  normalize=True,
                  anomaly_cat="all",
                  anomaly_level=None,
+                 anomaly_num=None,
                  transform=None,
                  pre_transform=None,
                  pre_filter=None):
@@ -178,6 +177,10 @@ class PSD_Dataset(InMemoryDataset):
 
                 # sort node name in json matches with node in csv.
                 df = df.iloc[df.index.map(nodes).argsort()]
+                hops = np.array([nx.shortest_path_length(self.nx_graph, 0, i) for i in range(len(nodes))])
+                # REVIEW: add node_id to feature -> nodes with different ids have different patterns
+                # df['node_id'] = np.arange(self.num_nodes_per_graph)
+                # df['node_hop'] = hops / hops.max()
 
                 x = torch.tensor(df.to_numpy(), dtype=torch.float32)
                 feat_list.append(df.to_numpy())
@@ -190,9 +193,9 @@ class PSD_Dataset(InMemoryDataset):
             all_feat = np.array(feat_list)
             # v_min = all_feat.min(axis=1, keepdims=True)
             # v_max = all_feat.max(axis=1, keepdims=True)
-            v_min = np.concatenate(all_feat).min(axis=0)
-            v_max = np.concatenate(all_feat).max(axis=0)
-            norm_feat = (all_feat - v_min) / (v_max - v_min) + 0
+            v_min = np.concatenate(all_feat).min(axis=(0))
+            v_max = np.concatenate(all_feat).max(axis=(0))
+            norm_feat = (all_feat - v_min) / (v_max - v_min)
             np.nan_to_num(norm_feat, False)
             for i, x in enumerate(norm_feat):
                 data_list[i].x = torch.tensor(x, dtype=torch.float32)

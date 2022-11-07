@@ -1,13 +1,12 @@
 """ Demo of node classification """
 
-from pydoc import describe
 import numpy as np
 import random
 import torch
 from psd_gnn.dataset import Merge_PSD_Dataset, PSD_Dataset
 from psd_gnn.models.node_classifier import GNN
 from psd_gnn.utils import process_args
-from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score, precision_score,
+from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score, precision_score, roc_auc_score,
                              recall_score)
 from torch.nn import CrossEntropyLoss
 from datetime import datetime
@@ -17,7 +16,7 @@ from torch.utils.tensorboard import SummaryWriter
 if __name__ == "__main__":
 
     args = process_args()
-    if args["workflow"] == "1000genome_new_2022":
+    if args["workflow"] in ["1000genome_new_2022", "montage"]:
         from psd_gnn.dataset_v2 import PSD_Dataset
 
     if args['seed'] != -1:
@@ -39,6 +38,7 @@ if __name__ == "__main__":
                               binary_labels=args['binary'],
                               anomaly_cat=args['anomaly_cat'],
                               anomaly_level=args['anomaly_level'],
+                              anomaly_num=args['anomaly_num'],
                               )
 
     data = dataset[0]
@@ -48,13 +48,18 @@ if __name__ == "__main__":
     NUM_OUT_FEATURES = dataset.num_classes
 
     ''' Build GNN model '''
-    model = GNN(NUM_NODE_FEATURES, args['hidden_size'], NUM_OUT_FEATURES).to(DEVICE)
+    model = GNN(NUM_NODE_FEATURES,
+                args['hidden_size'],
+                NUM_OUT_FEATURES, dropout=args['dropout']).to(DEVICE)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=args['lr'])
+    optimizer = torch.optim.Adam(model.parameters(),
+                                 lr=args['lr'],
+                                 weight_decay=args['weight_decay'])
     loss_func = CrossEntropyLoss()
 
     ts_start = datetime.now().strftime('%Y%m%d_%H%M%S')
-    writer = SummaryWriter(log_dir=f"{args['logdir']}/{args['workflow']}_{ts_start}")
+    if args['log']:
+        writer = SummaryWriter(log_dir=f"{args['logdir']}/{args['workflow']}_{ts_start}")
     data = data.to(DEVICE)
     pbar = tqdm(range(args['epoch']), desc=args['workflow'])
     for e in pbar:
@@ -66,10 +71,16 @@ if __name__ == "__main__":
 
         train_acc = accuracy_score(data.y[data.train_mask].detach().cpu().numpy(),
                                    y_hat[data.train_mask].argmax(dim=1).detach().cpu().numpy())
-        val_acc = accuracy_score(data.y[data.val_mask].detach().cpu().numpy(),
-                                 y_hat[data.val_mask].argmax(dim=1).detach().cpu().numpy())
         train_loss.backward()
         optimizer.step()
+
+        val_y_true = data.y[data.val_mask].detach().cpu().numpy()
+        val_y_pred = y_hat[data.val_mask].argmax(dim=1).detach().cpu().numpy()
+        val_acc = accuracy_score(val_y_true, val_y_pred)
+        val_prec = precision_score(val_y_true, val_y_pred)
+        val_f1 = f1_score(val_y_true, val_y_pred)
+        val_recall = recall_score(val_y_true, val_y_pred)
+        val_roc_auc = roc_auc_score(val_y_true, val_y_pred)
 
         if args['verbose']:
             pbar.set_postfix({"train_loss": train_loss.detach().cpu().item(),
@@ -80,36 +91,43 @@ if __name__ == "__main__":
             #       f"train acc {train_acc:.4f}",
             #       f"val acc {val_acc:.4f}",
             #       )
-        writer.add_scalar("Loss", train_loss, e)
-        writer.add_scalars("Accuracy", {"Training": train_acc,
-                                        "Validation": val_acc}, e)
+        if args['log']:
+            writer.add_scalar("Loss", train_loss, e)
+            writer.add_scalars("Accuracy", {"Training": train_acc,
+                                            "Validation": val_acc}, e)
+    y_true = data.y[data.train_mask].detach().cpu().numpy()
+    y_pred = y_hat[data.train_mask].argmax(dim=1).detach().cpu().numpy()
+    print("training", confusion_matrix(y_true, y_pred))
+
     model.eval()
     y_out = model(data.x, data.edge_index)
     y_true = data.y[data.test_mask].detach().cpu().numpy()
     y_pred = y_out[data.test_mask].argmax(dim=1).detach().cpu().numpy()
     test_acc = accuracy_score(y_true, y_pred)
     if args['binary']:
+        conf_mat = confusion_matrix(y_true, y_pred)
         test_prec = precision_score(y_true, y_pred)
         test_f1 = f1_score(y_true, y_pred)
         test_recall = recall_score(y_true, y_pred)
+        test_roc_auc = roc_auc_score(y_true, y_pred)
     else:
         conf_mat = confusion_matrix(y_true, y_pred)
         test_prec = precision_score(y_true, y_pred, average="weighted")
         test_f1 = f1_score(y_true, y_pred, average="weighted")
         test_recall = recall_score(y_true, y_pred, average="weighted")
+        test_roc_auc = roc_auc_score(y_true, y_pred, average="weighted")
 
     print("node level clf:",
           f"workflow {args['workflow']}",
           f"binary {args['binary']}",
           f"test acc {test_acc:.4f}",
+          f"roc-auc {test_roc_auc:.4f}",
           f"f1 {test_f1:.4f}",
           f"recall {test_recall:.4f}",
           f"prec {test_prec:.4f}",
           )
+    print("test", conf_mat)
 
-    # writer.add_hparams(args, {'acc': test_acc,
-    #                           'f1': test_f1,
-    #                           'recall': test_recall,
-    #                           'prec': test_prec})
-    writer.flush()
-    writer.close()
+    if args['log']:
+        writer.flush()
+        writer.close()

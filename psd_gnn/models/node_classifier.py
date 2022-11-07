@@ -7,8 +7,8 @@ Date: 2022-06-30
 
 import torch
 import torch.nn.functional as F
-from torch.nn import Linear, ModuleList, ReLU, Sequential
-from torch_geometric.nn import GCNConv
+from torch.nn import Linear, ModuleList, ReLU, Sequential, ELU
+from torch_geometric.nn import GCNConv, GATConv
 
 torch.manual_seed(0)
 
@@ -18,7 +18,8 @@ class GNN(torch.nn.Module):
                  n_node_features: int,
                  n_hidden: int,
                  n_output: int,
-                 n_conv_blocks: int = 1) -> None:
+                 n_conv_blocks: int = 1,
+                 dropout:float = 0.5) -> None:
         """ Init the GNN model (new version).
 
         Args:
@@ -41,10 +42,17 @@ class GNN(torch.nn.Module):
                 GCNConv(n_hidden, n_hidden),
                 ReLU(),
             ]
+            # REVIEW: with attention layers
+            # conv_blocks += [
+            #     GATConv(n_node_features, 8, heads=8, dropout=0.5),
+            #     ELU(),
+            #     GATConv(8 * 8, n_hidden, heads=1, concat=False, dropout=0.5),
+            # ]
 
         # group all the conv layers
         self.conv_layers = ModuleList(conv_blocks)
 
+        self.dropout = dropout
         # add the linear layers for flattening the output from MPNN
         self.flatten = Sequential(
             Linear(n_hidden, n_hidden),
@@ -65,11 +73,11 @@ class GNN(torch.nn.Module):
         """
         # process the layers
         for layer in self.conv_layers:
-            if isinstance(layer, GCNConv):
+            if isinstance(layer, GCNConv) or isinstance(layer, GATConv):
                 x = layer(x, edge_index)
             else:
                 x = layer(x)
-
+        x = F.dropout(x, p=self.dropout, training=self.training)
         # pass the output to the linear output layer
         out = self.flatten(x)
 

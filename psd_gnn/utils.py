@@ -8,6 +8,10 @@ import json
 import os
 import os.path as osp
 import pandas as pd
+import numpy as np
+import warnings
+from sklearn.model_selection import train_test_split
+warnings.simplefilter("ignore", category=UserWarning)
 
 
 def process_args():
@@ -22,6 +26,7 @@ def process_args():
                  "wind-clustering-casa",
                  "wind-noclustering-casa",
                  "1000genome_new_2022",
+                 "montage",
                  "all"
                  ]
 
@@ -58,6 +63,14 @@ def process_args():
                         type=float,
                         default=1e-3,
                         help="Learning rate.")
+    parser.add_argument("--weight_decay",
+                        type=float,
+                        default=0.,
+                        help="Weight decay for Adam.")
+    parser.add_argument("--dropout",
+                        type=float,
+                        default=0.5,
+                        help="Dropout in neural networks.")
     parser.add_argument("--seed",
                         type=int,
                         default=-1,
@@ -66,6 +79,9 @@ def process_args():
                         type=str,
                         default=".",
                         help="Specify the root path of file.")
+    parser.add_argument("--log",
+                        action="store_true",
+                        help="Toggle to log the training")
     parser.add_argument("--logdir",
                         type=str,
                         default="runs",
@@ -86,6 +102,9 @@ def process_args():
     parser.add_argument("--anomaly_level",
                         nargs="*",
                         help="Specify the anomaly levels. Multiple inputs.")
+    parser.add_argument("--anomaly_num",
+                        type=str,
+                        help="Specify the anomaly num from nodes.")
     args = vars(parser.parse_args())
 
     return args
@@ -144,7 +163,7 @@ def print_dataset_info(dataset):
     print(f"dataset                 {dataset.name} \n",
           f"# of graphs             {len(dataset)} \n",
           f"# of graph labels       {dataset.num_classes} \n",
-          f"# of node labels        {dataset.num_node_labels} \n",
+          f"# of node type          {dataset.num_node_labels} \n",
           f"# of node features      {dataset.num_node_features} \n",
           f"# of nodes per graph    {dataset[0].num_nodes} \n",
           f"# of edges per graph    {dataset[0].num_edges} \n",
@@ -282,6 +301,69 @@ def parse_data(flag, json_path, classes):
                 except BaseException:
                     print("Error with the file's {} format.".format(f))
     return graphs
+
+
+def norm_feature(X, fill_nan=0.0):
+    """ Standard rescale the features to [0, 1].
+
+    .. math::
+        x = (x-x.min()) / (x.max() - x.min())
+
+    Args:
+        X (np.ndarray): Feature matrix with dim (W, N, F).
+
+    Returns:
+        np.ndarray: Normalized matrix.
+    """
+    # min/max over W and N and normalize F.
+    v_min = X.min(axis=(0, 1))
+    v_max = X.max(axis=(0, 1))
+    X_norm = (X - v_min) / (v_max - v_min)
+    np.nan_to_num(X_norm, False, nan=fill_nan)
+    return X_norm
+
+
+def eval_metrics(y_true, y_pred, binary=False, **kwargs):
+    """ Evaluate the models
+
+    Args:
+        y_true (np.array): True y labels.
+        y_pred (np.array): Predicted y labels.
+        binary (bool, optional): Binary metrics. Defaults to False.
+    """
+    from sklearn.metrics import accuracy_score, recall_score, roc_auc_score, precision_score, f1_score, confusion_matrix
+
+    print(f"acc :{accuracy_score(y_true, y_pred):.4f}",
+          f"recall :{recall_score(y_true, y_pred, average='weighted'):.4f}",
+          f"roc-auc :{roc_auc_score(y_true, y_pred):.4f}",
+          f"prec :{precision_score(y_true, y_pred, average='weighted'):.4f}",
+          f"f1 :{f1_score(y_true, y_pred, average='weighted'):.4f}")
+
+    conf_mat = confusion_matrix(y_true, y_pred)
+    # print("confusion matrix", conf_mat)
+    # print("confusion matrix prob", np.array([d/d.sum() for d in conf_mat]))
+    # return np.array([d / d.sum() for d in conf_mat])
+    return conf_mat
+
+
+def split_train_val_test(n, train_size=0.6, val_size=0.2, test_size=0.2, **kwargs):
+    """ Split the n samples into train, validation and testing.
+
+    Args:
+        n (int): Number of samples
+        train_size (float, optional): Proportion of train size. Defaults to 0.6.
+        val_size (float, optional): Proportion of validation size. Defaults to 0.2.
+        test_size (float, optional): Proportion of testing size. Defaults to 0.2.
+
+    Returns:
+        tuple: Tuple of np.array representing the indices of train/val/testing.
+    """
+    assert train_size + val_size + test_size == 1
+    idx = np.arange(n)
+    random_state = np.random.RandomState(seed=0) if "random_state" not in kwargs else kwargs.get("random_state")
+    train_idx, test_idx = train_test_split(idx, train_size=0.6, random_state=random_state)
+    val_idx, test_idx = train_test_split(test_idx, test_size=0.5, random_state=random_state)
+    return train_idx, val_idx, test_idx
 
 
 def init_model(args):

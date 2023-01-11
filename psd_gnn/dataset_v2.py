@@ -23,7 +23,7 @@ class PSD_Dataset(InMemoryDataset):
 
     def __init__(self,
                  root="./",
-                 name="1000genome",
+                 name="1000genome_new_2022",
                  use_node_attr=True,
                  use_edge_attr=False,
                  force_reprocess=False,
@@ -32,6 +32,7 @@ class PSD_Dataset(InMemoryDataset):
                  normalize=True,
                  anomaly_cat="all",
                  anomaly_level=None,
+                 anomaly_num=None,
                  transform=None,
                  pre_transform=None,
                  pre_filter=None):
@@ -49,9 +50,7 @@ class PSD_Dataset(InMemoryDataset):
             pre_filter (callable, optional): Pre filter function. Defaults to None.
         """
         self.root = root
-        # self.name = name.lower()
-        # REVIEW:
-        self.name = "1000-genome"
+        self.name = name.lower()
         self.use_node_attr = use_node_attr
         self.use_edge_attr = use_edge_attr
         self.force_reprocess = force_reprocess
@@ -60,6 +59,7 @@ class PSD_Dataset(InMemoryDataset):
         self.normalize = normalize
         self.anomaly_cat = anomaly_cat.lower()
         self.anomaly_level = anomaly_level
+        self.anomaly_num = anomaly_num
 
         if self.force_reprocess:
             SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
@@ -109,9 +109,9 @@ class PSD_Dataset(InMemoryDataset):
     def process(self):
         """ Process the raw files, and save to processed files. """
         ''' process adj file '''
-        data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data_new")
+        data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data_test")
 
-        nodes, edges = parse_adj("1000genome_new_2022")
+        nodes, edges = parse_adj(self.name)
 
         # REVIEW: property decorator within the `process` function
         self.num_nodes_per_graph = len(nodes)
@@ -138,8 +138,15 @@ class PSD_Dataset(InMemoryDataset):
             else:
                 self.y_labels = ["normal"] + [f"{self.anomaly_cat}_{level}" for level in self.anomaly_level]
 
+                if self.anomaly_num is not None:
+                    self.y_labels = ["normal"] + \
+                        [f"{self.anomaly_cat}_{level}_{self.anomaly_num}" for level in self.anomaly_level]
+
         for y_idx, y_label in enumerate(self.y_labels):
-            raw_data_files = f"{data_folder}/{y_label}*/{self.name.replace('_', ' - ')}*.csv"
+            if self.name == "1000genome_new_2022":
+                raw_data_files = f"{data_folder}/{y_label}*/1000-genome*.csv"
+            else:
+                raw_data_files = f"{data_folder}/{y_label}*/{self.name.replace('_', '-')}*.csv"
             assert len(glob.glob(raw_data_files)) > 0, f"Incorrect anomaly cat and level {y_label}"
 
             for fn in glob.glob(raw_data_files):
@@ -159,8 +166,12 @@ class PSD_Dataset(InMemoryDataset):
                 df = df.fillna(0)
 
                 # shift timestamps
-                ts_anchor = df['ready'].min()
-                for attr in ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']:
+                # NOTE: shift timestamp by graph level
+                # ts_anchor = df['ready'].min()
+                # UPDATE: shift timestamp by node level
+                ts_anchor = df['ready']
+                tfs = ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']
+                for attr in tfs[::-1]:
                     df[attr] -= ts_anchor
 
                 # change the index the same as `nodes`
@@ -172,6 +183,7 @@ class PSD_Dataset(InMemoryDataset):
                 # sort node name in json matches with node in csv.
                 df = df.iloc[df.index.map(nodes).argsort()]
 
+                hops = np.array([nx.shortest_path_length(self.nx_graph, 0, i) for i in range(len(nodes))])
                 if self.node_level:
                     # binary labels 0/1
                     y = pd.factorize(df.anomaly_type)[0]
@@ -188,6 +200,7 @@ class PSD_Dataset(InMemoryDataset):
                 # print(y.sum(), self.num_nodes_per_graph)
                 y = torch.tensor(y)
                 df = df[self.features]
+                df['node_hop'] = hops
 
                 x = torch.tensor(df.to_numpy(), dtype=torch.float32)
                 feat_list.append(df.to_numpy())
@@ -198,10 +211,9 @@ class PSD_Dataset(InMemoryDataset):
         # backend: numpy
         if self.normalize:
             all_feat = np.array(feat_list)
-            # v_min = all_feat.min(axis=1, keepdims=True)
-            # v_max = all_feat.max(axis=1, keepdims=True)
-            v_min = np.concatenate(all_feat).min(axis=0)
-            v_max = np.concatenate(all_feat).max(axis=0)
+            # NOTE: normalized along workflow and nodes
+            v_min = np.concatenate(all_feat).min(axis=(0))
+            v_max = np.concatenate(all_feat).max(axis=(0))
             norm_feat = (all_feat - v_min) / (v_max - v_min) + 0
             np.nan_to_num(norm_feat, False)
             for i, x in enumerate(norm_feat):
@@ -218,11 +230,6 @@ class PSD_Dataset(InMemoryDataset):
 
             # NOTE: split the dataset into train/val/test as 60/20/20
             idx = np.arange(data.num_nodes)
-
-            # train_idx, test_idx = train_test_split(
-            #     idx, train_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
-            # val_idx, test_idx = train_test_split(
-            #     test_idx, train_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[test_idx])
 
             train_idx, test_idx = train_test_split(idx, train_size=0.6, random_state=0, shuffle=True)
             val_idx, test_idx = train_test_split(test_idx, train_size=0.5, random_state=0, shuffle=True)
@@ -242,106 +249,3 @@ class PSD_Dataset(InMemoryDataset):
 
     def __repr__(self):
         return f'{self.name}({len(self)}) node_level {self.node_level} binary_labels {self.binary_labels}'
-
-
-# class Merge_PSD_Dataset(InMemoryDataset):
-#     def __init__(self, root="./",
-#                  use_node_attr=True,
-#                  use_edge_attr=False,
-#                  force_reprocess=False,
-#                  node_level=False,
-#                  binary_labels=False,
-#                  normalize=True,
-#                  anomaly_cat="all",
-#                  anomaly_level=None,
-#                  transform=None,
-#                  pre_transform=None,
-#                  pre_filter=None) -> None:
-#         self.root = root
-#         self.name = "all"
-#         self.use_node_attr = use_node_attr
-#         self.use_edge_attr = use_edge_attr
-#         self.force_reprocess = force_reprocess
-#         self.node_level = node_level
-#         self.binary_labels = binary_labels
-#         self.normalize = normalize
-#         self.anomaly_cat = anomaly_cat.lower()
-#         self.anomaly_level = anomaly_level
-
-#         workflows = ["1000genome",
-#                      "nowcast-clustering-8",
-#                      "nowcast-clustering-16",
-#                      "wind-clustering-casa",
-#                      "wind-noclustering-casa"]
-#         # check all data are consistent and available
-#         for wf in workflows:
-#             dataset = PSD_Dataset(root=self.root,
-#                                   name=wf,
-#                                   use_node_attr=self.use_node_attr,
-#                                   use_edge_attr=self.use_edge_attr,
-#                                   force_reprocess=self.force_reprocess,
-#                                   node_level=self.node_level,
-#                                   binary_labels=self.binary_labels,
-#                                   normalize=self.normalize,
-#                                   anomaly_cat=self.anomaly_cat,
-#                                   anomaly_level=self.anomaly_level)
-
-#         super().__init__(root, transform, pre_transform, pre_filter)
-#         self.data, self.slices = torch.load(self.processed_paths[0])
-
-#     @property
-#     def processed_file_names(self):
-#         r"""The name of the files in the :obj:`self.processed_dir` folder that
-#         must be present in order to skip processing.
-
-#         Returns:
-#             list: List of file names.
-#         """
-#         SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
-#         create_dir(SAVED_PATH)
-#         return [f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pt',
-#                 f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pkl']
-
-#     def process(self):
-#         """ process """
-#         data_list = []
-#         for wn in ["1000genome",
-#                    "nowcast-clustering-8",
-#                    "nowcast-clustering-16",
-#                    "wind-clustering-casa",
-#                    "wind-noclustering-casa"]:
-#             wn_path = osp.join(osp.abspath(self.root), "processed", wn)
-#             subdata_list = pickle.load(
-#                 open(
-#                     f'{wn_path}/PSD_Dataset_binary_{self.binary_labels}_node_{self.node_level}.pkl',
-#                     'rb'))
-#             data_list += subdata_list
-#         pickle.dump(data_list, open(self.processed_file_names[1], "wb"))
-
-#         if self.node_level:
-#             data_batch = Batch.from_data_list(data_list)
-#             data = Data(x=data_batch.x, edge_index=data_batch.edge_index, y=data_batch.y)
-#             data = data if self.pre_transform is None else self.pre_transform(data)
-
-#             # NOTE: split the dataset into train/val/test as 60/20/20
-#             idx = np.arange(data.num_nodes)
-#             train_idx, test_idx = train_test_split(
-#                 idx, train_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
-#             val_idx, test_idx = train_test_split(
-#                 test_idx, train_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[test_idx])
-
-#             data.train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-#             data.train_mask[train_idx] = 1
-
-#             data.val_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-#             data.val_mask[val_idx] = 1
-
-#             data.test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-#             data.test_mask[test_idx] = 1
-#             torch.save(self.collate([data]), self.processed_paths[0])
-#         else:
-#             data, slices = self.collate(data_list)
-#             torch.save((data, slices), self.processed_paths[0])
-
-#     def __repr__(self):
-#         return f'{self.name}({len(self)}) node_level {self.node_level} binary_labels {self.binary_labels}'

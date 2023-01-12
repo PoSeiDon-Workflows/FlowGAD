@@ -12,19 +12,22 @@ if [ "$device" == "cpu" ]
 then
   echo "Install the version with CPU only"
   conda install pytorch torchvision torchaudio cpuonly pyg tensorboard \
-    matplotlib seaborn joblib networkx numba ipykernel flake8 autopep8 \
+    matplotlib seaborn joblib networkx numba \
+    ipykernel flake8 autopep8 graphviz jupyter ipywidgets \
     -c pytorch -c pyg
 elif [ "$device" == "gpu" ]
 then
   echo "Install the version with CUDA"
-  conda install pytorch torchvision torchaudio cudatoolkit=11.3 pyg tensorboard \
-    matplotlib seaborn joblib networkx numba ipykernel flake8 autopep8 \
-    -c pytorch -c pyg
+  conda install pytorch torchvision torchaudio cudatoolkit=11.6 pyg tensorboard \
+    matplotlib seaborn joblib networkx numba \
+    ipykernel flake8 autopep8 graphviz jupyter ipywidgets \
+    graphviz pygraphviz \
+    -c pytorch -c nvidia -c pyg
 else
   echo "Please choose from 'cpu' or 'gpu'."
 fi
 
 # pip install additional packages
-pip install deephyper pygod pyod class_resolver umap-learn
-
+pip install deephyper ray pygod pyod class_resolver umap-learn
+# problem with install pygraphviz
 python setup.py develop

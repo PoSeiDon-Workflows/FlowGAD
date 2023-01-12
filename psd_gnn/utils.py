@@ -323,27 +323,50 @@ def norm_feature(X, fill_nan=0.0):
     return X_norm
 
 
-def eval_metrics(y_true, y_pred, binary=False, **kwargs):
-    """ Evaluate the models
+def eval_metrics(y_true, y_pred, metric=None, average="weighted", **kwargs):
+    """Evaluate the models
 
     Args:
         y_true (np.array): True y labels.
         y_pred (np.array): Predicted y labels.
-        binary (bool, optional): Binary metrics. Defaults to False.
+        metric (str, optional): Option of ['acc', 'f1', 'prec', 'roc_auc', 'conf_mat'].
+                                Defaults to None, which eval all metrics
+        average (str, optional): This parameter is required for multiclass/multilabel targets.
+                                Defaults to "weighted".
+
+    Returns:
+        dict or float: metric results
     """
-    from sklearn.metrics import accuracy_score, recall_score, roc_auc_score, precision_score, f1_score, confusion_matrix
+    from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
+                                 precision_score, recall_score, roc_auc_score)
 
-    print(f"acc :{accuracy_score(y_true, y_pred):.4f}",
-          f"recall :{recall_score(y_true, y_pred, average='weighted'):.4f}",
-          f"roc-auc :{roc_auc_score(y_true, y_pred):.4f}",
-          f"prec :{precision_score(y_true, y_pred, average='weighted'):.4f}",
-          f"f1 :{f1_score(y_true, y_pred, average='weighted'):.4f}")
-
-    conf_mat = confusion_matrix(y_true, y_pred)
-    # print("confusion matrix", conf_mat)
-    # print("confusion matrix prob", np.array([d/d.sum() for d in conf_mat]))
-    # return np.array([d / d.sum() for d in conf_mat])
-    return conf_mat
+    if metric is None:
+        acc = accuracy_score(y_true, y_pred)
+        f1 = f1_score(y_true, y_pred, average=average)
+        prec = precision_score(y_true, y_pred, average=average)
+        recall = recall_score(y_true, y_pred, average=average)
+        roc_auc = roc_auc_score(y_true, y_pred, average=average)
+        conf_mat = confusion_matrix(y_true, y_pred)
+        return {"acc": acc,
+                "f1": f1,
+                "prec": prec,
+                "recall": recall,
+                "roc_auc": roc_auc,
+                "conf_mat": conf_mat}
+    else:
+        if metric == 'acc':
+            res = accuracy_score(y_true, y_pred)
+        elif metric == "f1":
+            res = f1_score(y_true, y_pred, average=average)
+        elif metric == "prec":
+            res = precision_score(y_true, y_pred, average=average)
+        elif metric == "recall":
+            res = recall_score(y_true, y_pred, average=average)
+        elif metric == "roc_auc":
+            res = roc_auc_score(y_true, y_pred, average=average)
+        elif metric == "conf_mat":
+            res = confusion_matrix(y_true, y_pred)
+        return res
 
 
 def split_train_val_test(n, train_size=0.6, val_size=0.2, test_size=0.2, **kwargs):

@@ -8,7 +8,7 @@ import torch
 from psd_gnn.dataset import Merge_PSD_Dataset, PSD_Dataset
 
 from psd_gnn.models.graph_classifier import GNN
-from psd_gnn.utils import process_args
+from psd_gnn.utils import process_args, eval_metrics, create_dir
 from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
                              precision_score, recall_score)
 from sklearn.model_selection import train_test_split
@@ -66,12 +66,15 @@ def test(model, loader):
 
 
 if __name__ == "__main__":
+
     args = process_args()
     if args['workflow'] == "1000genome_new_2022":
         from psd_gnn.dataset_v2 import PSD_Dataset
 
     if args["seed"] != -1:
         random.seed(args['seed'])
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(args['seed'])
         torch.manual_seed(args['seed'])
         np.random.seed(args['seed'])
 
@@ -88,11 +91,14 @@ if __name__ == "__main__":
                               node_level=False,
                               binary_labels=args['binary'],
                               anomaly_cat=args['anomaly_cat'],
-                              anomaly_level=args['anomaly_level']
+                              anomaly_level=args['anomaly_level'],
+                              anomaly_num=args['anomaly_num'],
                               ).shuffle()
 
     n_graphs = len(dataset)
-    y = dataset.data.y.numpy()
+    # ys = dataset.data.y.numpy()
+
+    # split train/val/test
     train_idx, test_idx = train_test_split(
         np.arange(n_graphs), train_size=args['train_size'], random_state=0, shuffle=True)
     val_idx, test_idx = train_test_split(test_idx, test_size=0.5, random_state=0, shuffle=True)
@@ -115,13 +121,22 @@ if __name__ == "__main__":
     ''' Build GNN model '''
     model = GNN(NUM_NODE_FEATURES, args['hidden_size'], NUM_OUT_FEATURES).to(DEVICE)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=args['lr'])
-    loss_func = CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(),
+                                 lr=args['lr'],
+                                 weight_decay=args['weight_decay'])
+
+    # weight for imbalanced data
+    if args['balance']:
+        class_weight = 1 - dataset.data.y[train_idx].bincount() / dataset.data.y[train_idx].shape[0]
+        loss_func = CrossEntropyLoss(weight=class_weight.to(DEVICE))
+    else:
+        loss_func = CrossEntropyLoss()
 
     ts_start = datetime.now().strftime('%Y%m%d_%H%M%S')
-    writer = SummaryWriter(log_dir=f"{args['logdir']}/{args['workflow']}_{ts_start}")
+    if args['log']:
+        writer = SummaryWriter(log_dir=f"{args['logdir']}/{args['workflow']}_{ts_start}")
 
-    pbar = tqdm(range(args['epoch']), desc=f"{args['workflow']}")
+    pbar = tqdm(range(args['epoch']), desc=f"{args['workflow']}", leave=True)
     best = 0
     for e in pbar:
         model.train()
@@ -133,55 +148,52 @@ if __name__ == "__main__":
         val_acc, _ = test(model, val_loader)
 
         if val_acc > best:
-            torch.save(model, osp.join("saved_models"))
+            # save tmp model on disk
+            create_dir("tmp_models")
+            torch.save(model, osp.join(f"tmp_models",
+                                       f"saved_models_{args['workflow']}_{ts_start}"))
         if args['verbose']:
             pbar.set_postfix({"train_loss": train_loss,
                               "train_acc": train_acc,
                               "val_acc": val_acc})
-            # print(f"epoch {e:03d}",
-            #       f"train loss {train_loss:.4f}",
-            #       f"train acc {train_acc:.4f}",
-            #       f"val acc {val_acc:.4f}",
-            #       )
-        writer.add_scalar("Loss", train_loss, e)
-        writer.add_scalars("Accuracy", {"training": train_acc, "validation": val_acc}, e)
-        # writer.add_scalar("Accuracy", train_acc, e)
-    ys = []
-    for data in train_loader:
-        # ys.append(data.y.item())
-        ys += data.y.detach().cpu().numpy().tolist()
-    y_true = ys
-    print(confusion_matrix(ys, y_pred))
+        if args['log']:
+            writer.add_scalar("Loss", train_loss, e)
+            writer.add_scalars("Accuracy", {"training": train_acc,
+                                            "validation": val_acc}, e)
 
-    test_acc, y_pred = test(model, test_loader)
+    if args['verbose']:
+        train_y_true = []
+        for data in train_loader:
+            train_y_true += data.y.detach().cpu().numpy().tolist()
 
-    y_true = []
-    for data in test_loader:
-        y_true += data.y.detach().cpu().numpy().tolist()
+        train_acc, train_y_pred = test(model, train_loader)
+        train_metrics = eval_metrics(train_y_true, train_y_pred)
+        print(f"Training acc {train_metrics['acc']:.4f}",
+              f"roc-auc {train_metrics['roc_auc']:.4f}",
+              f"f1 {train_metrics['f1']:.4f}",
+              f"recall {train_metrics['recall']:.4f}",
+              f"prec {train_metrics['prec']:.4f}")
+        print(train_metrics['conf_mat'])
 
-    if args['binary']:
-        conf_mat = confusion_matrix(y_true, y_pred)
-        prec_val = precision_score(y_true, y_pred)
-        f1_val = f1_score(y_true, y_pred)
-        recall_val = recall_score(y_true, y_pred)
+    test_acc, test_y_pred = test(model, test_loader)
+
+    if args['verbose']:
+        test_y_true = []
+        for data in test_loader:
+            test_y_true += data.y.detach().cpu().numpy().tolist()
+
+        test_metrics = eval_metrics(test_y_true, test_y_pred)
+        test_metrics = eval_metrics(test_y_true, test_y_pred)
+        print(f"Testing acc {test_metrics['acc']:.4f}",
+              f"roc-auc {test_metrics['roc_auc']:.4f}",
+              f"f1 {test_metrics['f1']:.4f}",
+              f"recall {test_metrics['recall']:.4f}",
+              f"prec {test_metrics['prec']:.4f}",
+              )
+        print(test_metrics['conf_mat'])
     else:
-        conf_mat = confusion_matrix(y_true, y_pred)
-        prec_val = precision_score(y_true, y_pred, average="weighted")
-        f1_val = f1_score(y_true, y_pred, average="weighted")
-        recall_val = recall_score(y_true, y_pred, average="weighted")
+        print(f"Testing acc {test_acc:.4f}")
 
-    print("graph level clf:",
-          f"workflow {args['workflow']}",
-          f"binary {args['binary']}",
-          f"test acc {test_acc:.4f}",
-          f"f1 {f1_val:.4f}",
-          f"recall {recall_val:.4f}",
-          f"prec {prec_val:.4f}",
-          )
-    print(conf_mat)
-    # writer.add_hparams(args, {'acc': test_acc,
-    #                           'f1': f1_val,
-    #                           'recall': recall_val,
-    #                           'prec': prec_val})
-    writer.flush()
-    writer.close()
+    if args['log']:
+        writer.flush()
+        writer.close()

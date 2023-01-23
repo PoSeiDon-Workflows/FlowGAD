@@ -45,6 +45,12 @@ class PSD_Dataset(InMemoryDataset):
             use_edge_attr (bool, optional): Use edge attributes. Defaults to False.
             force_reprocess (bool, optional): Force to reprocess. Defaults to False.
             node_level (bool, optional): Process as node level graphs if `True`. Defaults to False.
+            binary_labels (bool, optional): Binary labels. Defaults to False.
+            normalize (bool, optional): Normalize the node features to [0, 1]. Defaults to True.
+            anomaly_cat (str, optional): Specify the category of anomaly, choose from ['cpu', 'hdd', 'loss', 'all'].
+                                         Defaults to "all".
+            anomaly_level (_type_, optional): Specify the level of anomaly. Defaults to None.
+            anomaly_num (_type_, optional): Specify the number of anomaly. Defaults to None. Warning: this will be removed.
             transform (callable, optional): Transform function to process. Defaults to None.
             pre_transform (callable, optional): Pre_transform function. Defaults to None.
             pre_filter (callable, optional): Pre filter function. Defaults to None.
@@ -59,14 +65,13 @@ class PSD_Dataset(InMemoryDataset):
         self.normalize = normalize
         self.anomaly_cat = anomaly_cat.lower()
         self.anomaly_level = anomaly_level
+        self.anomaly_num = anomaly_num
 
         if self.force_reprocess:
             SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
-            SAVED_FILE = f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pt'
-            SAVED_FILE2 = f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pkl'
+            SAVED_FILE = f'{SAVED_PATH}/binary_{self.binary_labels}_node_{self.node_level}.pt'
             if osp.exists(SAVED_FILE):
                 os.remove(SAVED_FILE)
-                os.remove(SAVED_FILE2)
 
         # load data if processed
         super().__init__(root, transform, pre_transform, pre_filter)
@@ -82,8 +87,7 @@ class PSD_Dataset(InMemoryDataset):
         """
         SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
         create_dir(SAVED_PATH)
-        return [f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pt',
-                f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pkl']
+        return [f'{SAVED_PATH}/binary_{self.binary_labels}_node_{self.node_level}.pt']
 
     @property
     def num_node_attributes(self):
@@ -200,8 +204,6 @@ class PSD_Dataset(InMemoryDataset):
             for i, x in enumerate(norm_feat):
                 data_list[i].x = torch.tensor(x, dtype=torch.float32)
 
-        pickle.dump(data_list, open(self.processed_file_names[1], "wb"))
-
         # backend: pytorch
         # if self.normalize:
         #     all_feat = torch.stack(feat_list)
@@ -248,6 +250,7 @@ class PSD_Dataset(InMemoryDataset):
 
 class Merge_PSD_Dataset(InMemoryDataset):
     def __init__(self, root="./",
+                 name="all",
                  use_node_attr=True,
                  use_edge_attr=False,
                  force_reprocess=False,
@@ -301,8 +304,7 @@ class Merge_PSD_Dataset(InMemoryDataset):
         """
         SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
         create_dir(SAVED_PATH)
-        return [f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pt',
-                f'{SAVED_PATH}/{self.__class__.__name__}_binary_{self.binary_labels}_node_{self.node_level}.pkl']
+        return [f'{SAVED_PATH}/binary_{self.binary_labels}_node_{self.node_level}.pt']
 
     def process(self):
         """ process """
@@ -313,12 +315,8 @@ class Merge_PSD_Dataset(InMemoryDataset):
                    "wind-clustering-casa",
                    "wind-noclustering-casa"]:
             wn_path = osp.join(osp.abspath(self.root), "processed", wn)
-            subdata_list = pickle.load(
-                open(
-                    f'{wn_path}/PSD_Dataset_binary_{self.binary_labels}_node_{self.node_level}.pkl',
-                    'rb'))
-            data_list += subdata_list
-        pickle.dump(data_list, open(self.processed_file_names[1], "wb"))
+            data = torch.load(f'{wn_path}/binary_{self.binary_labels}_node_{self.node_level}.pt')[0]
+            data_list.append(data)
 
         if self.node_level:
             data_batch = Batch.from_data_list(data_list)

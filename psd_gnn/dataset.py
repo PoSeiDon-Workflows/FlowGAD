@@ -6,7 +6,6 @@ License: TBD
 import glob
 import os
 import os.path as osp
-import pickle
 
 import networkx as nx
 import numpy as np
@@ -112,10 +111,14 @@ class PSD_Dataset(InMemoryDataset):
     def process(self):
         """ Process the raw files, and save to processed files. """
         ''' process adj file '''
-        data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data")
+        if self.name in ['1000genome_new_2022', 'montage']:
+            data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data_new")
+        else:
+            data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data")
 
         nodes, edges = parse_adj(self.name)
 
+        # REVIEW: property decorator within the `process` function
         self.num_nodes_per_graph = len(nodes)
         self.num_edges_per_graph = len(edges)
         self.nx_graph = nx.DiGraph(edges)
@@ -133,7 +136,10 @@ class PSD_Dataset(InMemoryDataset):
         feat_list = []
 
         if self.anomaly_cat == "all":
-            self.y_labels = ["normal", "cpu", "hdd", "loss"]
+            if self.name in ['1000genome_new_2022', 'montage']:
+                self.y_labels = ["normal", "cpu", "hdd"]
+            else:
+                self.y_labels = ["normal", "cpu", "hdd", "loss"]
         else:
             if self.anomaly_level is None:
                 self.y_labels = ["normal", self.anomaly_cat]
@@ -165,12 +171,16 @@ class PSD_Dataset(InMemoryDataset):
                 # convert type to dummy features
                 df = pd.concat([pd.get_dummies(df.type), df], axis=1)
                 df = df.drop(["type"], axis=1)
-                df = df[self.features]
+                # df = df[self.features]
                 df = df.fillna(0)
 
                 # shift timestamps
-                ts_anchor = df['ready'].min()
-                for attr in ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']:
+                # NOTE: shift timestamp by graph level
+                # ts_anchor = df['ready'].min()
+                # UPDATE: shift timestamp by node level
+                ts_anchor = df['ready']
+                tfs = ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']
+                for attr in tfs[::-1]:
                     df[attr] -= ts_anchor
 
                 # change the index the same as `nodes`
@@ -182,9 +192,24 @@ class PSD_Dataset(InMemoryDataset):
                 # sort node name in json matches with node in csv.
                 df = df.iloc[df.index.map(nodes).argsort()]
                 hops = np.array([nx.shortest_path_length(self.nx_graph, 0, i) for i in range(len(nodes))])
-                # REVIEW: add node_id to feature -> nodes with different ids have different patterns
-                # df['node_id'] = np.arange(self.num_nodes_per_graph)
-                # df['node_hop'] = hops / hops.max()
+                if self.name in ['1000genome_new_2022', 'montage']:
+                    if self.node_level:
+                        # binary labels 0/1
+                        y = pd.factorize(df.anomaly_type)[0]
+                        # NOTE: convert the `1`s to `2`s in HDD
+                        if not self.binary_labels:
+                            if y_label == "hdd":
+                                y[np.where(y == 1)] = y_idx
+                    else:
+                        if not self.binary_labels:
+                            y = np.array([y_idx])
+                        else:
+                            y = np.array([1 if y_idx > 0 else 0])
+
+                # print(y.sum(), self.num_nodes_per_graph)
+                y = torch.tensor(y)
+                df = df[self.features]
+                df['node_hop'] = hops
 
                 x = torch.tensor(df.to_numpy(), dtype=torch.float32)
                 feat_list.append(df.to_numpy())
@@ -203,16 +228,6 @@ class PSD_Dataset(InMemoryDataset):
             np.nan_to_num(norm_feat, False)
             for i, x in enumerate(norm_feat):
                 data_list[i].x = torch.tensor(x, dtype=torch.float32)
-
-        # backend: pytorch
-        # if self.normalize:
-        #     all_feat = torch.stack(feat_list)
-        #     v_min = torch.min(all_feat, dim=1, keepdim=True)[0]
-        #     v_max = torch.max(all_feat, dim=1, keepdim=True)[0]
-        #     norm_feat = (all_feat - v_min) / (v_max - v_min)
-        #     torch.nan_to_num(norm_feat, 0, 1, 0)
-        #     for i, x in enumerate(norm_feat):
-        #         data_list[i].x = torch.tensor(x, dtype=torch.float32)
 
         # Save processed data
         if self.node_level:

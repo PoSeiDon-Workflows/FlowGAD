@@ -1,6 +1,10 @@
 """ PoSeiDon dataset wrapper as PyG.dataset.
 
 License: TBD
+
+NOTE:
+    * `1000genome_new_2022` and `montage` workflows are in `data_new` folder
+    * `1000genome_new_2022` and `montage` workflows only have `cpu` and `hdd` anomalies
 """
 
 import glob
@@ -18,7 +22,6 @@ from psd_gnn.utils import create_dir, parse_adj
 
 
 class PSD_Dataset(InMemoryDataset):
-    """ New normalizing process """
 
     def __init__(self,
                  root="./",
@@ -32,27 +35,43 @@ class PSD_Dataset(InMemoryDataset):
                  anomaly_cat="all",
                  anomaly_level=None,
                  anomaly_num=None,
+                 feature_option="v1",
                  transform=None,
                  pre_transform=None,
                  pre_filter=None):
         """ Customized dataset for PoSeiDon graphs.
 
         Args:
-            root (str, optional): Root of the processed path. Defaults to "./".
-            name (str, optional): Name of the workflow type. Defaults to "1000genome".
-            use_node_attr (bool, optional): Use node attributes. Defaults to False.
-            use_edge_attr (bool, optional): Use edge attributes. Defaults to False.
-            force_reprocess (bool, optional): Force to reprocess. Defaults to False.
-            node_level (bool, optional): Process as node level graphs if `True`. Defaults to False.
-            binary_labels (bool, optional): Binary labels. Defaults to False.
-            normalize (bool, optional): Normalize the node features to [0, 1]. Defaults to True.
+            root (str, optional): Root of the processed path.
+                                  Defaults to "./".
+            name (str, optional): Name of the workflow type.
+                                  Defaults to "1000genome".
+            use_node_attr (bool, optional): Use node attributes.
+                                            Defaults to False.
+            use_edge_attr (bool, optional): Use edge attributes.
+                                            Defaults to False.
+            force_reprocess (bool, optional): Force to reprocess, will delete the cached file on disk.
+                                              Defaults to False.
+            node_level (bool, optional): Process as node level graphs if `True`.
+                                         Defaults to False.
+            binary_labels (bool, optional): Binary labels.
+                                            Defaults to False.
+            normalize (bool, optional): Normalize the node features to [0, 1].
+                                        Defaults to True.
             anomaly_cat (str, optional): Specify the category of anomaly, choose from ['cpu', 'hdd', 'loss', 'all'].
                                          Defaults to "all".
-            anomaly_level (_type_, optional): Specify the level of anomaly. Defaults to None.
-            anomaly_num (_type_, optional): Specify the number of anomaly. Defaults to None. Warning: this will be removed.
-            transform (callable, optional): Transform function to process. Defaults to None.
-            pre_transform (callable, optional): Pre_transform function. Defaults to None.
-            pre_filter (callable, optional): Pre filter function. Defaults to None.
+            anomaly_level (int, optional): Specify the level of anomaly.
+                                              Defaults to None.
+            anomaly_num (int, optional): Specify the number of anomaly.
+                                            Defaults to None. Warning: this will be removed.
+            feature_option (str, optional): Specify the feature selected, choose from ['v1', 'v2'].
+                                            Defaults to "v1".
+            transform (callable, optional): Transform function to process.
+                                            Defaults to None.
+            pre_transform (callable, optional): Pre_transform function.
+                                                Defaults to None.
+            pre_filter (callable, optional): Pre filter function.
+                                             Defaults to None.
         """
         self.root = root
         self.name = name.lower()
@@ -65,6 +84,7 @@ class PSD_Dataset(InMemoryDataset):
         self.anomaly_cat = anomaly_cat.lower()
         self.anomaly_level = anomaly_level
         self.anomaly_num = anomaly_num
+        self.feature_option = feature_option
 
         if self.force_reprocess:
             SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
@@ -74,7 +94,7 @@ class PSD_Dataset(InMemoryDataset):
 
         # load data if processed
         super().__init__(root, transform, pre_transform, pre_filter)
-        self.data, self.slices = torch.load(self.processed_paths[0])
+        self.data, self.slices, self.sizes = torch.load(self.processed_paths[0])
 
     @property
     def processed_file_names(self):
@@ -108,23 +128,39 @@ class PSD_Dataset(InMemoryDataset):
     def num_edge_attributes(self):
         raise NotImplementedError
 
+    @property
+    def num_nodes_per_graph(self):
+        """ Number of nodes per workflow. """
+        return self.sizes['num_nodes_per_graph']
+
+    @property
+    def num_edges_per_graph(self):
+        """ Number of edges per workflow. """
+        return self.sizes['num_edges_per_graph']
+
     def process(self):
         """ Process the raw files, and save to processed files. """
+
         ''' process adj file '''
         if self.name in ['1000genome_new_2022', 'montage']:
             data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data_new")
         else:
             data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data")
 
+        ''' process adjacency file '''
         nodes, edges = parse_adj(self.name)
+        n_nodes, n_edges = len(nodes), len(edges)
 
-        # REVIEW: property decorator within the `process` function
-        self.num_nodes_per_graph = len(nodes)
-        self.num_edges_per_graph = len(edges)
+        # additional properties to store on disk
+        sizes = {'num_nodes_per_graph': n_nodes,
+                 'num_edges_per_graph': n_edges}
+
         self.nx_graph = nx.DiGraph(edges)
+
         # convert the edge_index with dim (2, E)
         edge_index = torch.tensor(edges).T
 
+        # select features
         self.features = ['auxiliary', 'compute', 'transfer'] + \
             ['is_clustered', 'ready', 'pre_script_start',
              'pre_script_end', 'submit', 'execute_start', 'execute_end',
@@ -132,6 +168,12 @@ class PSD_Dataset(InMemoryDataset):
              'queue_delay', 'runtime', 'post_script_delay', 'stage_in_delay',
              'stage_in_bytes', 'stage_out_delay', 'stage_out_bytes', 'kickstart_executables_cpu_time',
              'kickstart_status', 'kickstart_executables_exitcode']
+        self.ts_features = ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']
+        self.delay_features = ["wms_delay", "queue_delay", "runtime",
+                               "post_script_delay", "stage_in_delay", "stage_out_delay"]
+        self.bytes_features = ["stage_in_bytes", "stage_out_bytes"]
+        self.kickstart_features = ["kickstart_executables_cpu_time"]
+
         data_list = []
         feat_list = []
 
@@ -147,41 +189,35 @@ class PSD_Dataset(InMemoryDataset):
                 self.y_labels = ["normal"] + [f"{self.anomaly_cat}_{level}" for level in self.anomaly_level]
 
         for y_idx, y_label in enumerate(self.y_labels):
-            raw_data_files = f"{data_folder}/{y_label}*/{self.name.replace('_', ' - ')}*.csv"
+            if self.name == "1000genome_new_2022":
+                raw_data_files = f"{data_folder}/{y_label}*/1000*.csv"
+            else:
+                raw_data_files = f"{data_folder}/{y_label}*/{self.name.replace('_', '-')}*.csv"
+
             assert len(glob.glob(raw_data_files)) > 0, f"Incorrect anomaly cat and level {y_label}"
 
             for fn in glob.glob(raw_data_files):
-                if self.binary_labels:
-                    if "normal" in fn:
-                        y = [0] * self.num_nodes_per_graph if self.node_level else [0]
-                    else:
-                        y = [1] * self.num_nodes_per_graph if self.node_level else [1]
-                else:
-                    y = [y_idx] * self.num_nodes_per_graph if self.node_level else [y_idx]
-                y = torch.tensor(y)
 
+                # read from csv file
                 df = pd.read_csv(fn, index_col=[0])
                 # handle missing features
                 if "kickstart_executables_cpu_time" not in df.columns:
                     continue
-                # handle the nowind workflow
+                # handle missing nodes (the nowind workflow)
                 if df.shape[0] != len(nodes):
                     continue
 
-                # convert type to dummy features
+                # convert `type` to dummy features
                 df = pd.concat([pd.get_dummies(df.type), df], axis=1)
                 df = df.drop(["type"], axis=1)
-                # df = df[self.features]
                 df = df.fillna(0)
 
-                # shift timestamps
-                # NOTE: shift timestamp by graph level
-                # ts_anchor = df['ready'].min()
-                # UPDATE: shift timestamp by node level
-                ts_anchor = df['ready']
-                tfs = ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']
-                for attr in tfs[::-1]:
-                    df[attr] -= ts_anchor
+                # shift timestamp by node level
+                df[self.ts_features] = df[self.ts_features].sub(df[self.ts_features].ready, axis="rows")
+
+                # process hops
+                hops = np.array([nx.shortest_path_length(self.nx_graph, 0, i) for i in range(len(nodes))])
+                df['node_hop'] = hops
 
                 # change the index the same as `nodes`
                 for i, node in enumerate(df.index.values):
@@ -191,12 +227,20 @@ class PSD_Dataset(InMemoryDataset):
 
                 # sort node name in json matches with node in csv.
                 df = df.iloc[df.index.map(nodes).argsort()]
-                hops = np.array([nx.shortest_path_length(self.nx_graph, 0, i) for i in range(len(nodes))])
+
+                # update ys from df
+                if self.binary_labels:
+                    if "normal" in fn:
+                        y = [0] * n_nodes if self.node_level else [0]
+                    else:
+                        y = [1] * n_nodes if self.node_level else [1]
+                else:
+                    y = [y_idx] * n_nodes if self.node_level else [y_idx]
                 if self.name in ['1000genome_new_2022', 'montage']:
                     if self.node_level:
                         # binary labels 0/1
                         y = pd.factorize(df.anomaly_type)[0]
-                        # NOTE: convert the `1`s to `2`s in HDD
+                        # convert the `1`s to `2`s in HDD
                         if not self.binary_labels:
                             if y_label == "hdd":
                                 y[np.where(y == 1)] = y_idx
@@ -205,11 +249,16 @@ class PSD_Dataset(InMemoryDataset):
                             y = np.array([y_idx])
                         else:
                             y = np.array([1 if y_idx > 0 else 0])
-
-                # print(y.sum(), self.num_nodes_per_graph)
                 y = torch.tensor(y)
-                df = df[self.features]
-                df['node_hop'] = hops
+
+                # extract based on selected features
+                if self.feature_option == "v1":
+                    selected_features = self.features + ['node_hop']
+                elif self.feature_option == "v2":
+                    selected_features = self.delay_features + self.bytes_features \
+                        + self.kickstart_features + ['node_hop']
+
+                df = df[selected_features]
 
                 x = torch.tensor(df.to_numpy(), dtype=torch.float32)
                 feat_list.append(df.to_numpy())
@@ -238,11 +287,6 @@ class PSD_Dataset(InMemoryDataset):
             # NOTE: split the dataset into train/val/test as 60/20/20
             idx = np.arange(data.num_nodes)
 
-            # train_idx, test_idx = train_test_split(
-            #     idx, train_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
-            # val_idx, test_idx = train_test_split(
-            #     test_idx, train_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[test_idx])
-
             train_idx, test_idx = train_test_split(idx, train_size=0.6, random_state=0, shuffle=True)
             val_idx, test_idx = train_test_split(test_idx, train_size=0.5, random_state=0, shuffle=True)
 
@@ -254,10 +298,12 @@ class PSD_Dataset(InMemoryDataset):
 
             data.test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
             data.test_mask[test_idx] = 1
-            torch.save(self.collate([data]), self.processed_paths[0])
+            data, slices = self.collate([data])
         else:
             data, slices = self.collate(data_list)
-            torch.save((data, slices), self.processed_paths[0])
+
+        # store processed data on disk
+        torch.save((data, slices, sizes), self.processed_paths[0])
 
     def __repr__(self):
         return f'{self.name}({len(self)}) node_level {self.node_level} binary_labels {self.binary_labels}'

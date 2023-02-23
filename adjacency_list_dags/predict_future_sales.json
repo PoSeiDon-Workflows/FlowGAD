@@ -1,4 +1,8 @@
 {
+  "dummy_root": [
+    "create_dir_predict-future-sales_0_local",
+    "create_dir_predict-future-sales_0_condorpool"
+  ],
   "create_dir_predict-future-sales_0_local": [
     "stage_in_local_local_4_0"
   ],
@@ -432,13 +436,37 @@
   "xgboost_best_params_ID0000024_pegasus-plan_ID0000016": [
     "stage_out_local_condorpool_1_0_pegasus-plan_ID0000016"
   ],
-  "register_condorpool_0_2_pegasus-plan_ID0000016": [],
-  "register_condorpool_0_0_pegasus-plan_ID0000016": [],
-  "register_condorpool_0_1_pegasus-plan_ID0000016": [],
+  "register_condorpool_0_2_pegasus-plan_ID0000016": [
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000018",
+    "cleanup_predict-future-sales_0_local",
+    "xgboost_model_ID0000017",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
+  "register_condorpool_0_0_pegasus-plan_ID0000016": [
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000018",
+    "cleanup_predict-future-sales_0_local",
+    "xgboost_model_ID0000017",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
+  "register_condorpool_0_1_pegasus-plan_ID0000016": [
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000018",
+    "cleanup_predict-future-sales_0_local",
+    "xgboost_model_ID0000017",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
   "stage_out_local_condorpool_1_0_pegasus-plan_ID0000016": [
     "register_condorpool_1_0_pegasus-plan_ID0000016"
   ],
-  "register_condorpool_1_0_pegasus-plan_ID0000016": [],
+  "register_condorpool_1_0_pegasus-plan_ID0000016": [
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000018",
+    "cleanup_predict-future-sales_0_local",
+    "xgboost_model_ID0000017",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
   "create_dir_predict-future-sales-hp-tuning_0_condorpool_pegasus-plan_ID0000012": [
     "stage_in_local_condorpool_0_2_pegasus-plan_ID0000012",
     "stage_in_local_condorpool_0_1_pegasus-plan_ID0000012",
@@ -628,13 +656,37 @@
   "xgboost_best_params_ID0000024_pegasus-plan_ID0000012": [
     "stage_out_local_condorpool_1_0_pegasus-plan_ID0000012"
   ],
-  "register_condorpool_0_2_pegasus-plan_ID0000012": [],
-  "register_condorpool_0_0_pegasus-plan_ID0000012": [],
-  "register_condorpool_0_1_pegasus-plan_ID0000012": [],
+  "register_condorpool_0_2_pegasus-plan_ID0000012": [
+    "xgboost_model_ID0000013",
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000014",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
+  "register_condorpool_0_0_pegasus-plan_ID0000012": [
+    "xgboost_model_ID0000013",
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000014",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
+  "register_condorpool_0_1_pegasus-plan_ID0000012": [
+    "xgboost_model_ID0000013",
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000014",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
   "stage_out_local_condorpool_1_0_pegasus-plan_ID0000012": [
     "register_condorpool_1_0_pegasus-plan_ID0000012"
   ],
-  "register_condorpool_1_0_pegasus-plan_ID0000012": [],
+  "register_condorpool_1_0_pegasus-plan_ID0000012": [
+    "xgboost_model_ID0000013",
+    "stage_out_local_local_5_0",
+    "model_predict_ID0000014",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool"
+  ],
   "create_dir_predict-future-sales-hp-tuning_0_condorpool_pegasus-plan_ID0000020": [
     "stage_in_local_condorpool_0_2_pegasus-plan_ID0000020",
     "stage_in_local_condorpool_0_1_pegasus-plan_ID0000020",
@@ -824,11 +876,35 @@
   "xgboost_best_params_ID0000024_pegasus-plan_ID0000020": [
     "stage_out_local_condorpool_1_0_pegasus-plan_ID0000020"
   ],
-  "register_condorpool_0_2_pegasus-plan_ID0000020": [],
-  "register_condorpool_0_0_pegasus-plan_ID0000020": [],
-  "register_condorpool_0_1_pegasus-plan_ID0000020": [],
+  "register_condorpool_0_2_pegasus-plan_ID0000020": [
+    "stage_out_local_local_5_0",
+    "xgboost_model_ID0000021",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool",
+    "model_predict_ID0000022"
+  ],
+  "register_condorpool_0_0_pegasus-plan_ID0000020": [
+    "stage_out_local_local_5_0",
+    "xgboost_model_ID0000021",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool",
+    "model_predict_ID0000022"
+  ],
+  "register_condorpool_0_1_pegasus-plan_ID0000020": [
+    "stage_out_local_local_5_0",
+    "xgboost_model_ID0000021",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool",
+    "model_predict_ID0000022"
+  ],
   "stage_out_local_condorpool_1_0_pegasus-plan_ID0000020": [
     "register_condorpool_1_0_pegasus-plan_ID0000020"
   ],
-  "register_condorpool_1_0_pegasus-plan_ID0000020": []
+  "register_condorpool_1_0_pegasus-plan_ID0000020": [
+    "stage_out_local_local_5_0",
+    "xgboost_model_ID0000021",
+    "cleanup_predict-future-sales_0_local",
+    "cleanup_predict-future-sales_0_condorpool",
+    "model_predict_ID0000022"
+  ]
 }

@@ -1,8 +1,4 @@
 {
-  "dummy_root": [
-    "create_dir_predict-future-sales_0_local",
-    "create_dir_predict-future-sales_0_condorpool"
-  ],
   "create_dir_predict-future-sales_0_local": [
     "stage_in_local_local_4_0"
   ],

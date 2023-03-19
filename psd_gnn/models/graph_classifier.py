@@ -10,8 +10,6 @@ from torch.nn import Linear, ModuleList, ReLU, Sequential
 from torch_geometric.nn import GCNConv
 from torch_geometric.nn import global_mean_pool as gap
 
-torch.manual_seed(0)
-
 
 class GNN(torch.nn.Module):
     def __init__(self,
@@ -34,7 +32,7 @@ class GNN(torch.nn.Module):
         # add the ability to add one or more conv layers
         conv_blocks = []
 
-        # ability to  add one or more conv blocks
+        # ability to add one or more conv blocks
         for _ in range(n_conv_blocks):
             conv_blocks += [
                 GCNConv(n_node_features, n_hidden),
@@ -80,3 +78,9 @@ class GNN(torch.nn.Module):
 
         # return the output
         return F.log_softmax(out, dim=1)
+
+    def reset_parameters(self):
+        """ Reset the parameters of the model."""
+        for layer in self.children():
+            if hasattr(layer, 'reset_parameters'):
+                layer.reset_parameters()

@@ -7,10 +7,8 @@ Date: 2022-06-30
 
 import torch
 import torch.nn.functional as F
-from torch.nn import Linear, ModuleList, ReLU, Sequential, ELU
-from torch_geometric.nn import GCNConv, GATConv
-
-torch.manual_seed(0)
+from torch.nn import ELU, Linear, ModuleList, ReLU, Sequential
+from torch_geometric.nn import GATConv, GCNConv, GraphConv, SAGEConv
 
 
 class GNN(torch.nn.Module):
@@ -18,36 +16,33 @@ class GNN(torch.nn.Module):
                  n_node_features: int,
                  n_hidden: int,
                  n_output: int,
-                 n_conv_blocks: int = 1,
-                 dropout:float = 0.5) -> None:
+                 n_conv_blocks: int = 3,
+                 dropout: float = 0.5) -> None:
         """ Init the GNN model (new version).
 
         Args:
             n_node_features (int): Number of features at node level.
             n_hidden (int): Number of hidden dimension.
-            n_output (int): number of output dimension
-            n_conv_blocks (int): Number of
+            n_output (int): number of output dimension.
+            n_conv_blocks (int): Number of GCN blocks.
         """
         # super class the class structure
         super().__init__()
 
         # add the ability to add one or more conv layers
-        conv_blocks = []
+        conv_blocks = [
+            GCNConv(n_node_features, n_hidden),
+            ReLU(),
+        ]
 
         # ability to  add one or more conv blocks
-        for _ in range(n_conv_blocks):
+        for _ in range(n_conv_blocks - 1):
             conv_blocks += [
-                GCNConv(n_node_features, n_hidden),
+                GCNConv(n_hidden, n_hidden),
                 ReLU(),
                 GCNConv(n_hidden, n_hidden),
                 ReLU(),
             ]
-            # REVIEW: with attention layers
-            # conv_blocks += [
-            #     GATConv(n_node_features, 8, heads=8, dropout=0.5),
-            #     ELU(),
-            #     GATConv(8 * 8, n_hidden, heads=1, concat=False, dropout=0.5),
-            # ]
 
         # group all the conv layers
         self.conv_layers = ModuleList(conv_blocks)
@@ -61,7 +56,8 @@ class GNN(torch.nn.Module):
 
     def forward(self,
                 x: torch.Tensor,
-                edge_index: torch.Tensor) -> torch.Tensor:
+                edge_index: torch.Tensor,
+                edge_weight: torch.Tensor = None) -> torch.Tensor:
         """ Processing the GNN model.
 
         Args:
@@ -72,8 +68,11 @@ class GNN(torch.nn.Module):
             torch.Tensor: output tensor.
         """
         # process the layers
-        for layer in self.conv_layers:
-            if isinstance(layer, GCNConv) or isinstance(layer, GATConv):
+        for idx, layer in enumerate(self.conv_layers):
+            if isinstance(layer, GCNConv) or \
+               isinstance(layer, GATConv) or \
+               isinstance(layer, GraphConv) or \
+               isinstance(layer, SAGEConv):
                 x = layer(x, edge_index)
             else:
                 x = layer(x)
@@ -83,3 +82,9 @@ class GNN(torch.nn.Module):
 
         # return the output
         return F.log_softmax(out, dim=1)
+
+    def reset_parameters(self):
+        """ Reset the parameters of the model."""
+        for layer in self.children():
+            if hasattr(layer, 'reset_parameters'):
+                layer.reset_parameters()

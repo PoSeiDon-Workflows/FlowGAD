@@ -3,14 +3,17 @@
 License: TBD
 """
 import argparse
+import functools
 import glob
 import json
 import os
 import os.path as osp
-import pandas as pd
-import numpy as np
 import warnings
+
+import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
+
 warnings.simplefilter("ignore", category=UserWarning)
 
 
@@ -55,6 +58,10 @@ def process_args():
                         type=int,
                         default=32,
                         help="Batch size.")
+    parser.add_argument("--conv_blocks",
+                        type=int,
+                        default=2,
+                        help="Number of convolutional blocks")
     parser.add_argument("--train_size",
                         type=float,
                         default=0.6,
@@ -89,6 +96,9 @@ def process_args():
     parser.add_argument("--force",
                         action="store_true",
                         help="To force reprocess datasets.")
+    parser.add_argument("--balance",
+                        action="store_true",
+                        help="Enforce the weighted loss function.")
     parser.add_argument("--verbose", "-v",
                         action="store_true",
                         help="Toggle for verbose output.")
@@ -131,24 +141,34 @@ def parse_adj(workflow):
         adj_file = osp.join(adj_folder, f"{workflow.replace('-', '_')}.json")
     adj = json.load(open(adj_file))
 
-    # build dict of node: {node_name: idx}
-    nodes = {}
-    for idx, node_name in enumerate(adj.keys()):
-        if node_name.startswith("create_dir_") or node_name.startswith("cleanup_"):
-            node_name = node_name.split("-")[0]
-            nodes[node_name] = idx
-        else:
+    if workflow == "predict_future_sales":
+        nodes = {}
+        for idx, node_name in enumerate(adj.keys()):
             nodes[node_name] = idx
 
-    # build list of edges: [(target, source)]
-    edges = []
-    for u in adj:
-        for v in adj[u]:
-            if u.startswith("create_dir_") or u.startswith("cleanup_"):
-                u = u.split("-")[0]
-            if v.startswith("create_dir_") or v.startswith("cleanup_"):
-                v = v.split("-")[0]
-            edges.append((nodes[u], nodes[v]))
+        edges = []
+        for u in adj:
+            for v in adj[u]:
+                edges.append((nodes[u], nodes[v]))
+    else:
+        # build dict of node: {node_name: idx}
+        nodes = {}
+        for idx, node_name in enumerate(adj.keys()):
+            if node_name.startswith("create_dir_") or node_name.startswith("cleanup_"):
+                node_name = node_name.split("-")[0]
+                nodes[node_name] = idx
+            else:
+                nodes[node_name] = idx
+
+        # build list of edges: [(target, source)]
+        edges = []
+        for u in adj:
+            for v in adj[u]:
+                if u.startswith("create_dir_") or u.startswith("cleanup_"):
+                    u = u.split("-")[0]
+                if v.startswith("create_dir_") or v.startswith("cleanup_"):
+                    v = v.split("-")[0]
+                edges.append((nodes[u], nodes[v]))
 
     return nodes, edges
 
@@ -163,8 +183,7 @@ def print_dataset_info(dataset):
     print(f"dataset                 {dataset.name} \n",
           f"# of graphs             {len(dataset)} \n",
           f"# of graph labels       {dataset.num_classes} \n",
-          f"# of node type          {dataset.num_node_labels} \n",
-          f"# of node features      {dataset.num_node_features} \n",
+          f"# of node features      {dataset.data.num_node_features} \n",
           f"# of nodes per graph    {dataset[0].num_nodes} \n",
           f"# of edges per graph    {dataset[0].num_edges} \n",
           "##" * 20 + "\n"
@@ -193,6 +212,77 @@ def process_data(graphs, drop_columns):
     raise NotImplementedError
 
 
+def save_ckpt(filename, model, results_train, results_test, cg_dict=None, **kwargs):
+    """ Save a pre-trained pytorch model to checkpoint.
+
+    Args:
+        filename (str): Filename of saved checkpoint
+        model (class instance): Model instance.
+        results_train (dict): Results of training.
+        results_test (dict): Results of testing.
+        cg_dict (dict): A dictionary of sampled computation graphs.
+    """
+    import torch
+    torch.save({
+        "epoch": kwargs.num_epochs,
+        "model_type": kwargs.explainer_name,
+        "optimizer": kwargs.optimizer,
+        "results_train": results_train,
+        "results_test": results_test,
+        "model_state": model.state_dict(),
+        "cg": cg_dict
+    }, filename)
+
+
+def load_ckpt(filename, device, **kwargs):
+    """ Load a pre-trained pytorch model from checkpoint.
+
+    Args:
+        filename (str): Filename to save checkpoint.
+        device (str): CUDA or CPU.
+    """
+    import torch
+    print("loading model")
+    print(filename)
+    if os.path.isfile(filename):
+        print("=> loading checkpoint '{}'".format(filename))
+        ckpt = torch.load(filename, map_location=device)
+    else:
+        print("Checkpoint does not exist!")
+        print("Checked path -- {}".format(filename))
+        print("Make sure you have provided the correct path!")
+        print("You may have forgotten to train a model for this dataset.")
+        print()
+        print("To train one of the paper's models, run the following")
+        print(">> python train.py --dataset=DATASET_NAME")
+        print()
+        raise Exception("File not found.")
+    return ckpt
+
+
+def deprecated(func):
+    """ This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used.
+
+    Args:
+        func (function): Function name.
+
+    Returns:
+        object: return from `func`.
+    """
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+        warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)  # reset filter
+        return func(*args, **kwargs)
+    return new_func
+
+
+@deprecated
 def parse_data(flag, json_path, classes):
     """ Parse the json file into graphs.
 
@@ -251,13 +341,13 @@ def parse_data(flag, json_path, classes):
     with open(json_path, "r") as f:
         adjacency_list = json.load(f)
 
-        for l in adjacency_list:
-            lookup[l] = counter
+        for node in adjacency_list:
+            lookup[node] = counter
             counter += 1
 
-        for l in adjacency_list:
-            for e in adjacency_list[l]:
-                edge_index.append([lookup[l], lookup[e]])
+        for node in adjacency_list:
+            for e in adjacency_list[node]:
+                edge_index.append([lookup[node], lookup[e]])
         for d in os.listdir("data"):
             for f in glob.glob(os.path.join("data", d, flag + "*")):
                 try:
@@ -269,11 +359,11 @@ def parse_data(flag, json_path, classes):
                         features = features.fillna(0)
                         # features = features.replace('', -1, regex=True)
 
-                        for l in lookup:
-                            if l.startswith("create_dir_") or l.startswith("cleanup_"):
-                                new_l = l.split("-")[0]
+                        for node in lookup:
+                            if node.startswith("create_dir_") or node.startswith("cleanup_"):
+                                new_l = node.split("-")[0]
                             else:
-                                new_l = l
+                                new_l = node
                             job_features = features[features.index.str.startswith(new_l)][columns].values.tolist()[0]
 
                             if len(features[features.index.str.startswith(new_l)]) < 1:
@@ -286,7 +376,7 @@ def parse_data(flag, json_path, classes):
                                 job_features[0] = 2
                             # REVIEW: what's the line below
                             job_features = [-1 if x != x else x for x in job_features]
-                            graph['x'].insert(lookup[l], job_features)
+                            graph['x'].insert(lookup[node], job_features)
 
                         t_list = []
                         for i in range(len(graph['x'])):
@@ -399,7 +489,9 @@ def init_model(args):
         object: Model object.
     """
     from random import choice
-    from pygod.models import AdONE, AnomalyDAE, CONAD, DOMINANT, DONE, GAAN, GCNAE, GUIDE, MLPAE, Radar, ANOMALOUS, SCAN
+
+    from pygod.models import (ANOMALOUS, CONAD, DOMINANT, DONE, GAAN, GCNAE,
+                              GUIDE, MLPAE, SCAN, AdONE, AnomalyDAE, Radar)
     from pyod.models.lof import LOF
     from sklearn.ensemble import IsolationForest
     if not isinstance(args, dict):
@@ -538,3 +630,37 @@ def init_model(args):
         return ANOMALOUS(lr=choice(lr), gpu=gpu)
     elif model_name == 'scan':
         return SCAN(eps=choice([0.3, 0.5, 0.8]), mu=choice([2, 5, 10]))
+
+
+def wasserstein_distance(C, p, q, backend="cvxpy"):
+    r"""Computes the Wasserstein distance between two probability distributions.
+
+    .. math::
+        W(p, q) = \inf_{\gamma \in \Pi(p, q)} \sum_{i, j} \gamma_{i, j} |i - j|
+
+    Args:
+        C (torch.tensor): Cost matrix with dim (m, n).
+        p (torch.tensor): Probability distribution with dim (m, ).
+        q (torch.tensor): Probability distribution with dim (n, ).
+        backend (str, optional): Backend to use. Defaults to "cvxpy".
+
+    Returns:
+        torch.tensor: Wasserstein distance.
+    """
+    if backend == "cvxpy":
+        import cvxpy as cp
+
+        X = cp.Variable((len(p), len(q)))
+        objective = cp.Minimize(cp.trace(X, C))
+        # x = cp.Variable(len(p))
+        # objective = cp.Minimize(cp.sum(cp.multiply(p, x)))
+        constraints = [X.sum(0) == p, X.sum(1) == q, X >= 0]
+        prob = cp.Problem(objective, constraints)
+        prob.solve(solver=cp.ECOS)
+        return prob.value
+
+    elif backend == "torch":
+        # TODO: implement the torch version using cvxpylayers
+        # example here: https://github.com/cvxgrp/cvxpylayers#pytorch
+        import torch
+        raise NotImplementedError

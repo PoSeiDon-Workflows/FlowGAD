@@ -113,10 +113,10 @@ class PSD_Dataset(InMemoryDataset):
         """ Number of node features. """
         if self.data.x is None:
             return 0
-        return self.data.x.shape[1] - self.num_node_labels
+        return self.data.x.shape[1] - self.num_node_types
 
     @property
-    def num_node_labels(self):
+    def num_node_types(self):
         """ Number of node labels.
 
         Returns:
@@ -285,19 +285,19 @@ class PSD_Dataset(InMemoryDataset):
             data = data if self.pre_transform is None else self.pre_transform(data)
 
             # NOTE: split the dataset into train/val/test as 60/20/20
-            idx = np.arange(data.num_nodes)
+            # idx = np.arange(data.num_nodes)
 
-            train_idx, test_idx = train_test_split(idx, train_size=0.6, random_state=0, shuffle=True)
-            val_idx, test_idx = train_test_split(test_idx, train_size=0.5, random_state=0, shuffle=True)
+            # train_idx, test_idx = train_test_split(idx, train_size=0.6, random_state=0, shuffle=True)
+            # val_idx, test_idx = train_test_split(test_idx, train_size=0.5, random_state=0, shuffle=True)
 
-            data.train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-            data.train_mask[train_idx] = 1
+            # data.train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            # data.train_mask[train_idx] = 1
 
-            data.val_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-            data.val_mask[val_idx] = 1
+            # data.val_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            # data.val_mask[val_idx] = 1
 
-            data.test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-            data.test_mask[test_idx] = 1
+            # data.test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            # data.test_mask[test_idx] = 1
             data, slices = self.collate([data])
         else:
             data, slices = self.collate(data_list)
@@ -338,7 +338,9 @@ class Merge_PSD_Dataset(InMemoryDataset):
                      "nowcast-clustering-8",
                      "nowcast-clustering-16",
                      "wind-clustering-casa",
-                     "wind-noclustering-casa"]
+                     "wind-noclustering-casa",
+                     "1000genome_new_2022",
+                     "montage"]
         # check all data are consistent and available
         for wf in workflows:
             dataset = PSD_Dataset(root=self.root,
@@ -353,7 +355,7 @@ class Merge_PSD_Dataset(InMemoryDataset):
                                   anomaly_level=self.anomaly_level)
 
         super().__init__(root, transform, pre_transform, pre_filter)
-        self.data, self.slices = torch.load(self.processed_paths[0])
+        self.data, self.slices, _ = torch.load(self.processed_paths[0])
 
     @property
     def processed_file_names(self):
@@ -374,7 +376,9 @@ class Merge_PSD_Dataset(InMemoryDataset):
                    "nowcast-clustering-8",
                    "nowcast-clustering-16",
                    "wind-clustering-casa",
-                   "wind-noclustering-casa"]:
+                   "wind-noclustering-casa",
+                   "1000genome_new_2022",
+                   "montage"]:
             wn_path = osp.join(osp.abspath(self.root), "processed", wn)
             data = torch.load(f'{wn_path}/binary_{self.binary_labels}_node_{self.node_level}.pt')[0]
             data_list.append(data)

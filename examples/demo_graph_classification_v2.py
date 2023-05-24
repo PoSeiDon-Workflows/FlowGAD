@@ -2,6 +2,14 @@
 
 NOTE: with reduced anomaly data in training
 """
+
+
+import sys 
+import os, sys
+sys.path.append('/Users/krishnanraghavan/Documents/Projects/Poseidon/graph_nn_2')
+
+
+
 import os.path as osp
 import random
 from datetime import datetime
@@ -19,6 +27,8 @@ from torch.nn import CrossEntropyLoss
 from torch.utils.tensorboard import SummaryWriter
 from torch_geometric.loader import DataLoader
 from tqdm import tqdm
+
+
 
 
 def train(model, loader):

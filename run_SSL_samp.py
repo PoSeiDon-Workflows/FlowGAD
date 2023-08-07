@@ -8,8 +8,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch_geometric.transforms as T
-from pygod.metrics import (eval_average_precision, eval_precision_at_k,
+# import torch_geometric.transforms as T
+from pygod.metric import (eval_average_precision, eval_precision_at_k,
                            eval_recall_at_k, eval_roc_auc)
 from scipy.special import erf
 from scipy.stats import binom
@@ -40,28 +40,6 @@ from psd_gnn.dataset import PSD_Dataset
 
 
 
-def sample_gumbel(shape, eps=1e-20):
-    unif = torch.rand(*shape)
-    g = -torch.log(-torch.log(unif + eps))
-    return g 
-
-def sample_gumbel_softmax(logits, temperature):
-    """
-        Input:
-        logits: Tensor of log probs, shape = BS x k
-        temperature = scalar
-        
-        Output: Tensor of values sampled from Gumbel softmax.
-                These will tend towards a one-hot representation in the limit of temp -> 0
-                shape = BS x k
-    """
-    g = sample_gumbel(logits.shape)
-    h = (g + logits)/temperature
-    h_max = h.max(dim=-1, keepdim=True)[0]
-    h = h - h_max
-    cache = torch.exp(h)
-    y = cache / cache.sum(dim=-1, keepdim=True)
-    return y
 
 
 
@@ -164,8 +142,49 @@ class SSL(nn.Module):
         self.K=K
         self.temperature=temperature
 
+
+    def sample_gumbel(self, shape, eps=1e-20):
+        unif = torch.rand(*shape)
+        g = -torch.log(-torch.log(unif + eps))
+        return g 
+
+    def sample_gumbel_softmax(self, logits, temperature):
+        """
+            Input:
+            logits: Tensor of log probs, shape = BS x k
+            temperature = scalar
+            
+            Output: Tensor of values sampled from Gumbel softmax.
+                    These will tend towards a one-hot representation in the limit of temp -> 0
+                    shape = BS x k
+        """
+        g = self.sample_gumbel(logits.shape)
+        g = g.to(self.device)
+        h = (g + logits)/temperature
+        h_max = h.max(dim=-1, keepdim=True)[0]
+        h = h - h_max
+        cache = torch.exp(h)
+        y = cache / cache.sum(dim=-1, keepdim=True)
+        return y
+
+
+     #  Processing Gaussian 
+    def gaussian(self, x):
+        from sklearn.preprocessing import MinMaxScaler
+        scaler = MinMaxScaler()
+        return scaler.fit_transform(x.reshape([-1,1])).reshape([-1])
+        # x = x.reshape([-1])
+        # x = 
+        # print(min(x), max(x))
+        # print(np.exp(x)**2 ))
+
+        # print(np.exp(x).sum())
+        # scores = (np.exp(x) / np.exp(x).sum())
+        # print(min(scores), max(scores))
+        # return scores
+    
     #  Processing uncertainty scores
-    def generate_anomaly__list_(self, uncert__, y_true, **kwargs):
+    def generate_anomaly__list_(self, uncert__, y_true, iter, **kwargs):
         """ Sample from workflows with anomaly types.
 
         Args:
@@ -182,18 +201,22 @@ class SSL(nn.Module):
         # print("The list, I am working with ", Tot_list)
         # print("The uncertainty scores corresponding to it", uncert__)
         # print("The labels I am working with", y_true)
+        # print(uncert__.shape)
+        uncert__ = self.gaussian( np.abs(uncert__)  ) 
+        # print(min(uncert__), max(uncert__))
         min__ = np.argsort(uncert__)
         y = np.reshape(y_true.numpy()[min__], [-1])
-        # print("The labels now", y)
-        y__ = y[0:1]
-        y__converted = [Tot_list[ele] for ele in y__]
+        y__converted = [Tot_list[ele] for ele in y]
         # print(y__, y__converted)
+        # print(np.concatenate([uncert__.reshape([-1,1]), y.reshape([-1,1])], axis = 1))
+        np.savetxt('anomalies'+str(iter)+'.csv', np.concatenate([uncert__.reshape([-1,1]),\
+                y.reshape([-1,1])], axis = 1), delimiter=',')
         return y__converted[0]
 
 
     # NOTE: update the dataset.py file in your local folder.
     def generate_anomaly_type_data(self, workflows=None, anomaly_types=None,\
-                                   uncert__=None, y=None, sample_size=30, **kwargs):
+                                   uncert__=None, y=None, sample_size=30, iter__ = None, **kwargs):
         """ Sample from workflows with anomaly types.
 
         Args:
@@ -231,9 +254,9 @@ class SSL(nn.Module):
         else:  
             # print("with uncertainty")
             # print("The y in this loop", y)            
-            new_anomaly__ = self.generate_anomaly__list_(uncert__, y)
+            new_anomaly__ = self.generate_anomaly__list_(uncert__, y, iter=iter__)
             anomaly_types.append( str(new_anomaly__) )
-            # print("this is what I came out", anomaly_types)
+            #print("this is what I came out", anomaly_types)
             workflows = [workflows] if isinstance(workflows, str) else workflows
             dataset = Merge_PSD_Dataset(ROOT, name=workflows, 
                                         anomaly_cat=anomaly_types, 
@@ -316,7 +339,7 @@ class SSL(nn.Module):
             x.requires_grad=True  
             h = F.log_softmax(self.model.embed(x, edge_index).view(-1, self.N, self.K), dim=-1)
             # Sampling
-            h = sample_gumbel_softmax(h, self.temperature).view(-1, self.N*self.K)
+            h = self.sample_gumbel_softmax(h, self.temperature).view(-1, self.N*self.K)
             # reconstruction loss
             x_ = self.model.reconstruct(h, edge_index)
             score = torch.mean(self.loss_func(x, x_))
@@ -350,7 +373,7 @@ class SSL(nn.Module):
             h = self.model.embed(x, edge_index)
             h = F.log_softmax(h.view(-1, self.N, self.K), dim=-1)
             # Sampling
-            h = sample_gumbel_softmax(h, self.temperature).view(-1, self.N*self.K)
+            h = self.sample_gumbel_softmax(h, self.temperature).view(-1, self.N*self.K)
             # reconstruction loss
             x_ = self.model.reconstruct(h, edge_index)
             score = self.loss_func(x[:batch_size], x_[:batch_size])
@@ -375,12 +398,10 @@ class SSL(nn.Module):
         self : object
             Fitted estimator.
         """
-        
         dtest__ = self.generate_anomaly_type_data('1000genome_new_2022', "all")[0]
         y_true = deepcopy(dtest__.y)
         y_true[y_true>0]=1
         # print("These are the labels, I am going through", y_true, dtest__.y, y_true.shape, dtest__.y.shape)
-
         self.model = SSL_Base(in_dim=dtest__.x.shape[1],
                                     hid_dim=self.hid_dim,
                                     num_layers=self.num_layers,
@@ -403,7 +424,7 @@ class SSL(nn.Module):
                 data, curr_wfs = self.generate_anomaly_type_data("1000genome_new_2022",\
                                                         anomaly_types = curr_wfs,\
                                                         uncert__=score__uncert,\
-                                                        y=data.y)
+                                                        y=data.y, iter=j)
                 data = data[0]
                 
             # merge into something that is kept on a memory
@@ -433,7 +454,7 @@ class SSL(nn.Module):
             ANNEAL_RATE = 0.001
             # decision scores for each node
             decision_scores = np.zeros(data.x.shape[0])
-            print("The last anomaly", curr_wfs[-1])
+            # print("The last anomaly", curr_wfs[-1])
             
             for epoch in range(self.epoch):
                 epoch_loss = 0
@@ -443,17 +464,22 @@ class SSL(nn.Module):
                     batch_size = sampled_data.batch_size
                     node_idx = sampled_data.node_idx
                     x, edge_index = self.process_graph(sampled_data)
-
-                    # generate augmented graph
+                    x = x.to(self.device)
+                    edge_index = edge_index.to(self.device)
+                    
+                    #generate augmented graph
                     x_aug, label_aug = self._data_augmentation(x)
+                    x_aug = x.to(self.device)
+                    label_aug = label_aug.to(self.device)
+
                     h_aug = self.model.embed(x_aug, edge_index)
                     h = self.model.embed(x, edge_index)
                     h = F.log_softmax(h.view(-1, self.N, self.K), dim=-1)
                     h_aug = F.log_softmax(h.view(-1, self.N, self.K), dim=-1)
-
+                    
                     # Sampling
-                    h = sample_gumbel_softmax(h, self.temperature).view(-1, self.N*self.K)
-                    h_aug = sample_gumbel_softmax(h_aug, self.temperature).view(-1, self.N*self.K)
+                    h = self.sample_gumbel_softmax(h, self.temperature).view(-1, self.N*self.K)
+                    h_aug = self.sample_gumbel_softmax(h_aug, self.temperature).view(-1, self.N*self.K)
 
                     # margin loss
                     margin_loss = self.margin_loss_func(h, h_aug, h) * label_aug
@@ -473,25 +499,26 @@ class SSL(nn.Module):
 
                     # NEW
                     # decision_scores[node_idx] = score.detach().cpu().numpy()
-                    epoch_loss += loss.item() * x.shape[0]
+                    epoch_loss += loss.detach().cpu().item() * x.shape[0]
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
 
                 if epoch % 1==0:
                     self.temperature = np.maximum(self.temperature * np.exp(-ANNEAL_RATE * epoch), temp_min)
-                    print("New Model Temperature: {}".format(self.temperature))
+                    # print("New Model Temperature: {}".format(self.temperature))
                     
                 if self.verbose:
                     print("Epoch {:04d}: Loss {:.4f}".format(epoch, epoch_loss / data.x.shape[0]), end='')
                     score__uncert = self.generate_uncert_scores(data)
+
                     # print("the norm of the uncertainty score", np.linalg.norm(score__uncert))
                     if y_true is not None:
                         # print(y_true.shape, y_true)
-                        decision_scores = self.test(dtest__)
+                        decision_scores =  self.test(dtest__)
                         # print(decision_scores)
                         auc = roc_auc_score(y_true, decision_scores)
-                        top_k = eval_precision_at_k(y_true, decision_scores, k=y_true.sum())
+                        top_k = eval_precision_at_k(y_true, torch.from_numpy(decision_scores), k=y_true.sum())
                         prec = eval_average_precision(y_true, decision_scores)
                         scores[str(j)] = (score__uncert , (epoch_loss / data.x.shape[0]), auc, top_k.item(), prec)
                         print(f" | AUC {auc:.4f} | Aver Prec. {prec:.4f} | top_k {top_k:.4f}", end='')
@@ -961,8 +988,8 @@ for i in range(5):
                 weight_decay=1e-3,
                 dropout=0.5,
                 lr=1e-4,
-                epoch=5,
-                iter__=5,
+                epoch=10,
+                iter__=30,
                 gpu=0,
                 alpha=0.5,
                 batch_size=8,

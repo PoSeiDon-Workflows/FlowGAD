@@ -1,0 +1,4 @@
+Jobid: 696589
+qsub -n 1 -t 6:00:00 -q dgx psd_run.sh
+Mon Aug 07 02:59:03 2023 +0000 (UTC) submitted with cwd set to: /home/kraghavan/Projects/Poseidan/graph_nn_2
+jobid 696589 submitted from terminal /dev/pts/0

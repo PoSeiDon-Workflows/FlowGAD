@@ -60,7 +60,6 @@ class PSD_Dataset(InMemoryDataset):
                  pre_filter=None):
 
         self.root = root
-        print(name)
         self.name = name.lower()
         self.use_node_attr = use_node_attr
         self.use_edge_attr = use_edge_attr
@@ -267,11 +266,10 @@ class PSD_Dataset(InMemoryDataset):
                         + self.kickstart_features + ['node_hop']
                 elif self.feature_option == "v3":
                     selected_features = self.features + ['node_hop'] + self.new_features
-
                 df = df[selected_features]
+                x = torch.tensor(df.to_numpy(dtype=np.float32), dtype=torch.float32)
+                feat_list.append(df.to_numpy(dtype=np.float32))
 
-                x = torch.tensor(df.to_numpy(), dtype=torch.float32)
-                feat_list.append(df.to_numpy())
                 data = Data(x=x, edge_index=edge_index, y=y)
                 # dump into local files
                 # pk_file = fn.split("/")[-1].split(".")[0]

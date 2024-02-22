@@ -1,0 +1,351 @@
+1000-genome,run0139,cpu_3,worker1-container-28-31 worker1-container-4-7 worker1-container-20-23 worker2-container-28-31 worker1-container-36-39
+1000-genome,run0138,cpu_3,worker1-container-36-39 worker1-container-28-31 worker1-container-4-7 worker1-container-20-23 worker2-container-28-31
+1000-genome,run0146,cpu_3,worker1-container-4-7 worker1-container-20-23 worker1-container-36-39 worker2-container-28-31 worker1-container-28-31
+1000-genome,run0152,cpu_3,worker1-container-28-31 worker1-container-36-39 worker2-container-28-31 worker1-container-4-7 worker1-container-20-23
+1000-genome,run0142,cpu_3,worker1-container-28-31 worker1-container-20-23 worker1-container-36-39 worker1-container-4-7 worker2-container-28-31
+1000-genome,run0136,cpu_3,worker1-container-4-7 worker1-container-28-31 worker1-container-20-23 worker2-container-28-31 worker1-container-36-39
+1000-genome,run0143,cpu_3,worker1-container-36-39 worker2-container-28-31 worker1-container-20-23 worker1-container-28-31 worker1-container-4-7
+1000-genome,run0156,cpu_3,worker1-container-28-31 worker1-container-36-39 worker1-container-4-7 worker1-container-20-23 worker2-container-28-31
+1000-genome,run0144,cpu_3,worker1-container-28-31 worker1-container-36-39 worker1-container-4-7 worker1-container-20-23 worker2-container-28-31
+1000-genome,run0141,cpu_3,worker1-container-28-31 worker1-container-36-39 worker2-container-28-31 worker1-container-20-23 worker1-container-4-7
+1000-genome,run0149,cpu_3,worker1-container-28-31 worker1-container-36-39 worker1-container-20-23 worker2-container-28-31 worker1-container-4-7
+1000-genome,run0134,cpu_3,worker2-container-28-31 worker1-container-4-7 worker1-container-36-39 worker1-container-28-31 worker1-container-20-23
+1000-genome,run0145,cpu_3,worker1-container-28-31 worker1-container-36-39 worker1-container-20-23 worker1-container-4-7 worker2-container-28-31
+1000-genome,run0150,cpu_3,worker1-container-28-31 worker1-container-20-23 worker1-container-4-7 worker1-container-36-39 worker2-container-28-31
+1000-genome,run0140,cpu_3,worker1-container-28-31 worker1-container-20-23 worker1-container-4-7 worker2-container-28-31 worker1-container-36-39
+1000-genome,run0151,cpu_3,worker1-container-28-31 worker1-container-36-39 worker2-container-28-31 worker1-container-4-7 worker1-container-20-23
+1000-genome,run0153,cpu_3,worker1-container-28-31 worker1-container-36-39 worker1-container-20-23 worker2-container-28-31 worker1-container-4-7
+1000-genome,run0137,cpu_3,worker1-container-28-31 worker1-container-20-23 worker1-container-36-39 worker2-container-28-31 worker1-container-4-7
+1000-genome,run0158,cpu_3,worker1-container-4-7 worker1-container-28-31 worker2-container-28-31 worker1-container-20-23 worker1-container-36-39
+1000-genome,run0147,cpu_3,worker1-container-28-31 worker1-container-20-23 worker1-container-4-7 worker2-container-28-31 worker1-container-36-39
+1000-genome,run0135,cpu_3,worker1-container-28-31 worker1-container-36-39 worker2-container-28-31 worker1-container-4-7 worker1-container-20-23
+1000-genome,run0148,cpu_3,worker1-container-28-31 worker1-container-36-39 worker1-container-20-23 worker2-container-28-31 worker1-container-4-7
+1000-genome,run0155,cpu_3,worker1-container-28-31 worker1-container-36-39 worker1-container-20-23 worker1-container-4-7 worker2-container-28-31
+1000-genome,run0154,cpu_3,worker1-container-28-31 worker1-container-36-39 worker2-container-28-31 worker1-container-4-7 worker1-container-20-23
+1000-genome,run0157,cpu_3,worker1-container-28-31 worker1-container-4-7 worker1-container-20-23 worker2-container-28-31 worker1-container-36-39
+1000-genome,run0169,hdd_5,worker1-container-8-11 worker1-container-12-15 worker2-container-8-11 worker2-container-4-7 worker2-container-32-35 worker1-container-4-7 worker1-container-20-23 worker2-container-16-19 worker1-container-28-31 worker1-container-36-39
+1000-genome,run0085,hdd_5,worker2-container-0-3 worker1-container-12-15 worker1-container-16-19 worker1-container-32-35 worker1-container-28-31
+1000-genome,run0133,hdd_5,worker2-container-12-15 worker1-container-8-11 worker2-container-36-39 worker2-container-32-35 worker1-container-12-15
+1000-genome,run0126,hdd_5,worker2-container-12-15 worker2-container-32-35 worker2-container-36-39 worker1-container-8-11 worker1-container-12-15
+1000-genome,run0100,hdd_5,worker2-container-0-3 worker1-container-12-15 worker1-container-16-19 worker1-container-32-35 worker1-container-28-31
+1000-genome,run0208,hdd_5,worker1-container-28-31 worker1-container-12-15 worker2-container-28-31 worker2-container-36-39 worker1-container-16-19 worker2-container-32-35 worker1-container-20-23 worker2-container-24-27 worker1-container-4-7 worker1-container-8-11 worker2-container-4-7 worker2-container-12-15 worker2-container-8-11 worker2-container-20-23 worker1-container-24-27
+1000-genome,run0116,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0163,hdd_5,worker1-container-36-39 worker2-container-16-19 worker1-container-28-31 worker1-container-8-11 worker1-container-12-15 worker2-container-4-7 worker2-container-32-35 worker1-container-4-7 worker1-container-20-23 worker2-container-8-11
+1000-genome,run0114,hdd_5,worker2-container-12-15 worker1-container-8-11 worker2-container-36-39 worker1-container-12-15 worker2-container-32-35
+1000-genome,run0105,hdd_5,worker1-container-16-19 worker1-container-32-35 worker1-container-12-15 worker1-container-28-31 worker2-container-0-3
+1000-genome,run0121,hdd_5,worker2-container-36-39 worker2-container-32-35 worker1-container-12-15 worker2-container-12-15 worker1-container-8-11
+1000-genome,run0196,hdd_5,worker2-container-24-27 worker1-container-28-31 worker2-container-28-31 worker1-container-20-23 worker2-container-8-11 worker1-container-12-15 worker1-container-4-7 worker2-container-20-23 worker2-container-36-39 worker1-container-24-27 worker1-container-8-11 worker2-container-4-7 worker2-container-12-15 worker2-container-32-35 worker1-container-16-19
+1000-genome,run0104,hdd_5,worker2-container-0-3 worker1-container-16-19 worker1-container-12-15 worker1-container-28-31 worker1-container-32-35
+1000-genome,run0118,hdd_5,worker2-container-12-15 worker2-container-36-39 worker1-container-12-15 worker2-container-32-35 worker1-container-8-11
+1000-genome,run0167,hdd_5,worker1-container-20-23 worker1-container-4-7 worker1-container-12-15 worker2-container-8-11 worker1-container-36-39 worker1-container-28-31 worker2-container-16-19 worker2-container-32-35 worker1-container-8-11 worker2-container-4-7
+1000-genome,run0200,hdd_5,worker1-container-12-15 worker2-container-28-31 worker2-container-4-7 worker2-container-12-15 worker1-container-16-19 worker1-container-4-7 worker2-container-32-35 worker1-container-28-31 worker2-container-36-39 worker1-container-8-11 worker2-container-24-27 worker2-container-8-11 worker2-container-20-23 worker1-container-24-27 worker1-container-20-23
+1000-genome,run0087,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-28-31 worker1-container-16-19 worker1-container-12-15
+1000-genome,run0110,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0174,hdd_5,worker2-container-16-19 worker2-container-8-11 worker1-container-28-31 worker2-container-4-7 worker1-container-36-39 worker1-container-4-7 worker1-container-20-23 worker1-container-12-15 worker2-container-32-35 worker1-container-8-11
+1000-genome,run0172,hdd_5,worker1-container-8-11 worker1-container-28-31 worker2-container-8-11 worker2-container-4-7 worker1-container-36-39 worker2-container-32-35 worker2-container-16-19 worker1-container-4-7 worker1-container-12-15 worker1-container-20-23
+1000-genome,run0130,hdd_5,worker2-container-12-15 worker2-container-32-35 worker2-container-36-39 worker1-container-8-11 worker1-container-12-15
+1000-genome,run0160,hdd_5,worker2-container-8-11 worker2-container-16-19 worker2-container-4-7 worker1-container-12-15 worker2-container-32-35 worker1-container-8-11 worker1-container-36-39 worker1-container-20-23 worker1-container-28-31 worker1-container-4-7
+1000-genome,run0102,hdd_5,worker2-container-0-3 worker1-container-12-15 worker1-container-16-19 worker1-container-32-35 worker1-container-28-31
+1000-genome,run0194,hdd_5,worker2-container-32-35 worker2-container-20-23 worker2-container-4-7 worker2-container-12-15 worker1-container-12-15 worker1-container-16-19 worker1-container-20-23 worker2-container-28-31 worker2-container-24-27 worker1-container-8-11 worker1-container-4-7 worker1-container-24-27 worker1-container-28-31 worker2-container-8-11 worker2-container-36-39
+1000-genome,run0091,hdd_5,worker1-container-16-19 worker2-container-0-3 worker1-container-32-35 worker1-container-12-15 worker1-container-28-31
+1000-genome,run0094,hdd_5,worker2-container-0-3 worker1-container-16-19 worker1-container-32-35 worker1-container-12-15 worker1-container-28-31
+1000-genome,run0125,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0101,hdd_5,worker1-container-32-35 worker1-container-12-15 worker2-container-0-3 worker1-container-16-19 worker1-container-28-31
+1000-genome,run0193,hdd_5,worker1-container-28-31 worker1-container-12-15 worker2-container-24-27 worker1-container-16-19 worker2-container-20-23 worker2-container-28-31 worker1-container-20-23 worker2-container-36-39 worker2-container-8-11 worker2-container-32-35 worker1-container-24-27 worker2-container-4-7 worker2-container-12-15 worker1-container-4-7 worker1-container-8-11
+1000-genome,run0127,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker2-container-36-39 worker1-container-8-11
+1000-genome,run0109,hdd_5,worker2-container-36-39 worker2-container-32-35 worker2-container-12-15 worker1-container-8-11 worker1-container-12-15
+1000-genome,run0206,hdd_5,worker2-container-24-27 worker1-container-12-15 worker2-container-28-31 worker2-container-12-15 worker2-container-4-7 worker1-container-4-7 worker2-container-32-35 worker1-container-24-27 worker1-container-28-31 worker1-container-20-23 worker2-container-36-39 worker2-container-8-11 worker2-container-20-23 worker1-container-8-11 worker1-container-16-19
+1000-genome,run0179,hdd_5,worker2-container-8-11 worker1-container-12-15 worker1-container-20-23 worker2-container-32-35 worker2-container-4-7 worker1-container-28-31 worker1-container-36-39 worker2-container-16-19 worker1-container-8-11 worker1-container-4-7
+1000-genome,run0186,hdd_5,worker1-container-28-31 worker1-container-12-15 worker2-container-28-31 worker2-container-4-7 worker2-container-12-15 worker2-container-32-35 worker2-container-24-27 worker1-container-20-23 worker1-container-8-11 worker1-container-4-7 worker2-container-36-39 worker1-container-24-27 worker2-container-8-11 worker2-container-20-23 worker1-container-16-19
+1000-genome,run0095,hdd_5,worker1-container-32-35 worker2-container-0-3 worker1-container-28-31 worker1-container-16-19 worker1-container-12-15
+1000-genome,run0099,hdd_5,worker2-container-0-3 worker1-container-12-15 worker1-container-32-35 worker1-container-28-31 worker1-container-16-19
+1000-genome,run0175,hdd_5,worker1-container-4-7 worker1-container-12-15 worker1-container-28-31 worker2-container-8-11 worker2-container-4-7 worker1-container-36-39 worker2-container-32-35 worker1-container-20-23 worker2-container-16-19 worker1-container-8-11
+1000-genome,run0084,hdd_5,worker2-container-0-3 worker1-container-16-19 worker1-container-28-31 worker1-container-32-35 worker1-container-12-15
+1000-genome,run0205,hdd_5,worker1-container-16-19 worker2-container-24-27 worker2-container-4-7 worker2-container-12-15 worker2-container-28-31 worker1-container-8-11 worker2-container-20-23 worker2-container-32-35 worker1-container-24-27 worker1-container-28-31 worker2-container-36-39 worker2-container-8-11 worker1-container-4-7 worker1-container-12-15 worker1-container-20-23
+1000-genome,run0177,hdd_5,worker2-container-8-11 worker2-container-4-7 worker1-container-12-15 worker2-container-32-35 worker1-container-36-39 worker1-container-4-7 worker1-container-8-11 worker2-container-16-19 worker1-container-28-31 worker1-container-20-23
+1000-genome,run0182,hdd_5,worker2-container-8-11 worker2-container-4-7 worker1-container-36-39 worker2-container-32-35 worker1-container-28-31 worker1-container-20-23 worker1-container-8-11 worker2-container-16-19 worker1-container-12-15 worker1-container-4-7
+1000-genome,run0122,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0188,hdd_5,worker1-container-28-31 worker1-container-12-15 worker2-container-28-31 worker2-container-4-7 worker2-container-12-15 worker2-container-32-35 worker1-container-20-23 worker1-container-24-27 worker2-container-24-27 worker2-container-36-39 worker1-container-4-7 worker2-container-8-11 worker2-container-20-23 worker1-container-8-11 worker1-container-16-19
+1000-genome,run0107,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-16-19 worker1-container-28-31 worker1-container-12-15
+1000-genome,run0124,hdd_5,worker2-container-12-15 worker2-container-32-35 worker1-container-8-11 worker2-container-36-39 worker1-container-12-15
+1000-genome,run0120,hdd_5,worker2-container-12-15 worker2-container-32-35 worker1-container-8-11 worker2-container-36-39 worker1-container-12-15
+1000-genome,run0165,hdd_5,worker2-container-16-19 worker1-container-4-7 worker2-container-8-11 worker1-container-36-39 worker2-container-4-7 worker1-container-12-15 worker1-container-20-23 worker1-container-28-31 worker1-container-8-11 worker2-container-32-35
+1000-genome,run0115,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-8-11 worker2-container-36-39 worker1-container-12-15
+1000-genome,run0203,hdd_5,worker2-container-8-11 worker2-container-24-27 worker1-container-4-7 worker1-container-12-15 worker2-container-28-31 worker1-container-16-19 worker1-container-20-23 worker2-container-20-23 worker2-container-36-39 worker1-container-24-27 worker1-container-28-31 worker2-container-4-7 worker2-container-12-15 worker1-container-8-11 worker2-container-32-35
+1000-genome,run0184,hdd_5,worker2-container-24-27 worker1-container-12-15 worker2-container-28-31 worker1-container-16-19 worker2-container-8-11 worker2-container-12-15 worker1-container-24-27 worker1-container-28-31 worker2-container-32-35 worker1-container-20-23 worker1-container-8-11 worker2-container-36-39 worker2-container-4-7 worker2-container-20-23 worker1-container-4-7
+1000-genome,run0159,hdd_5,worker1-container-4-7 worker2-container-8-11 worker2-container-4-7 worker1-container-36-39 worker2-container-32-35 worker1-container-20-23 worker2-container-16-19 worker1-container-28-31 worker1-container-12-15 worker1-container-8-11
+1000-genome,run0199,hdd_5,worker2-container-24-27 worker2-container-20-23 worker1-container-28-31 worker2-container-28-31 worker1-container-16-19 worker1-container-12-15 worker1-container-20-23 worker1-container-24-27 worker2-container-8-11 worker1-container-8-11 worker2-container-36-39 worker2-container-32-35 worker2-container-4-7 worker2-container-12-15 worker1-container-4-7
+1000-genome,run0197,hdd_5,worker2-container-24-27 worker1-container-28-31 worker1-container-12-15 worker2-container-28-31 worker1-container-16-19 worker2-container-12-15 worker2-container-36-39 worker2-container-32-35 worker2-container-20-23 worker1-container-24-27 worker1-container-8-11 worker2-container-4-7 worker2-container-8-11 worker1-container-20-23 worker1-container-4-7
+1000-genome,run0207,hdd_5,worker1-container-8-11 worker2-container-20-23 worker2-container-24-27 worker1-container-12-15 worker2-container-28-31 worker1-container-16-19 worker2-container-36-39 worker1-container-20-23 worker2-container-8-11 worker1-container-4-7 worker1-container-24-27 worker2-container-4-7 worker2-container-12-15 worker1-container-28-31 worker2-container-32-35
+1000-genome,run0092,hdd_5,worker1-container-28-31 worker2-container-0-3 worker1-container-12-15 worker1-container-32-35 worker1-container-16-19
+1000-genome,run0123,hdd_5,worker2-container-32-35 worker2-container-36-39 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11
+1000-genome,run0096,hdd_5,worker1-container-32-35 worker2-container-0-3 worker1-container-16-19 worker1-container-28-31 worker1-container-12-15
+1000-genome,run0180,hdd_5,worker1-container-28-31 worker2-container-4-7 worker2-container-8-11 worker2-container-16-19 worker1-container-36-39 worker1-container-12-15 worker2-container-32-35 worker1-container-20-23 worker1-container-8-11 worker1-container-4-7
+1000-genome,run0106,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-16-19 worker1-container-28-31 worker1-container-12-15
+1000-genome,run0192,hdd_5,worker1-container-16-19 worker1-container-12-15 worker2-container-4-7 worker2-container-28-31 worker2-container-12-15 worker1-container-4-7 worker1-container-20-23 worker1-container-28-31 worker2-container-36-39 worker1-container-8-11 worker2-container-8-11 worker2-container-20-23 worker2-container-24-27 worker1-container-24-27 worker2-container-32-35
+1000-genome,run0204,hdd_5,worker2-container-8-11 worker2-container-20-23 worker2-container-24-27 worker1-container-12-15 worker2-container-28-31 worker1-container-16-19 worker2-container-36-39 worker1-container-4-7 worker2-container-12-15 worker1-container-24-27 worker1-container-28-31 worker1-container-8-11 worker2-container-4-7 worker1-container-20-23 worker2-container-32-35
+1000-genome,run0202,hdd_5,worker2-container-28-31 worker1-container-12-15 worker2-container-8-11 worker2-container-24-27 worker2-container-4-7 worker1-container-16-19 worker2-container-36-39 worker2-container-32-35 worker1-container-28-31 worker1-container-24-27 worker1-container-20-23 worker1-container-8-11 worker2-container-12-15 worker2-container-20-23 worker1-container-4-7
+1000-genome,run0093,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-16-19 worker1-container-12-15 worker1-container-28-31
+1000-genome,run0097,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-12-15 worker1-container-28-31 worker1-container-16-19
+1000-genome,run0129,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0086,hdd_5,worker2-container-0-3 worker1-container-12-15 worker1-container-32-35 worker1-container-28-31 worker1-container-16-19
+1000-genome,run0113,hdd_5,worker2-container-36-39 worker2-container-32-35 worker2-container-12-15 worker1-container-8-11 worker1-container-12-15
+1000-genome,run0168,hdd_5,worker1-container-12-15 worker1-container-8-11 worker2-container-8-11 worker2-container-4-7 worker1-container-36-39 worker2-container-16-19 worker2-container-32-35 worker1-container-20-23 worker1-container-28-31 worker1-container-4-7
+1000-genome,run0171,hdd_5,worker2-container-8-11 worker2-container-4-7 worker2-container-16-19 worker1-container-28-31 worker1-container-36-39 worker1-container-4-7 worker2-container-32-35 worker1-container-20-23 worker1-container-12-15 worker1-container-8-11
+1000-genome,run0173,hdd_5,worker1-container-8-11 worker2-container-8-11 worker1-container-28-31 worker1-container-36-39 worker2-container-4-7 worker2-container-32-35 worker2-container-16-19 worker1-container-12-15 worker1-container-4-7 worker1-container-20-23
+1000-genome,run0191,hdd_5,worker2-container-28-31 worker1-container-12-15 worker2-container-4-7 worker1-container-16-19 worker1-container-20-23 worker2-container-32-35 worker1-container-4-7 worker2-container-24-27 worker1-container-8-11 worker1-container-24-27 worker2-container-12-15 worker2-container-8-11 worker2-container-20-23 worker1-container-28-31 worker2-container-36-39
+1000-genome,run0198,hdd_5,worker1-container-16-19 worker2-container-4-7 worker2-container-28-31 worker1-container-12-15 worker2-container-12-15 worker1-container-24-27 worker2-container-36-39 worker2-container-32-35 worker1-container-28-31 worker1-container-8-11 worker2-container-8-11 worker2-container-20-23 worker1-container-20-23 worker2-container-24-27 worker1-container-4-7
+1000-genome,run0098,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-16-19 worker1-container-28-31 worker1-container-12-15
+1000-genome,run0089,hdd_5,worker2-container-0-3 worker1-container-16-19 worker1-container-12-15 worker1-container-28-31 worker1-container-32-35
+1000-genome,run0131,hdd_5,worker2-container-36-39 worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11
+1000-genome,run0183,hdd_5,worker2-container-8-11 worker2-container-4-7 worker1-container-4-7 worker1-container-36-39 worker2-container-32-35 worker1-container-8-11 worker1-container-20-23 worker1-container-28-31 worker2-container-16-19 worker1-container-12-15
+1000-genome,run0161,hdd_5,worker1-container-28-31 worker1-container-4-7 worker2-container-8-11 worker2-container-4-7 worker1-container-36-39 worker1-container-20-23 worker1-container-8-11 worker2-container-16-19 worker1-container-12-15 worker2-container-32-35
+1000-genome,run0181,hdd_5,worker1-container-4-7 worker2-container-8-11 worker1-container-8-11 worker2-container-4-7 worker1-container-36-39 worker1-container-20-23 worker1-container-28-31 worker2-container-16-19 worker1-container-12-15 worker2-container-32-35
+1000-genome,run0162,hdd_5,worker1-container-28-31 worker2-container-8-11 worker1-container-8-11 worker1-container-36-39 worker2-container-16-19 worker2-container-32-35 worker1-container-20-23 worker1-container-4-7 worker1-container-12-15 worker2-container-4-7
+1000-genome,run0112,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0088,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-16-19 worker1-container-28-31 worker1-container-12-15
+1000-genome,run0117,hdd_5,worker1-container-12-15 worker2-container-32-35 worker2-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0176,hdd_5,worker1-container-12-15 worker1-container-28-31 worker1-container-8-11 worker2-container-4-7 worker1-container-36-39 worker2-container-32-35 worker2-container-8-11 worker1-container-20-23 worker1-container-4-7 worker2-container-16-19
+1000-genome,run0190,hdd_5,worker1-container-28-31 worker1-container-12-15 worker2-container-4-7 worker1-container-20-23 worker2-container-28-31 worker1-container-16-19 worker2-container-8-11 worker1-container-8-11 worker2-container-20-23 worker2-container-32-35 worker2-container-36-39 worker1-container-24-27 worker2-container-12-15 worker2-container-24-27 worker1-container-4-7
+1000-genome,run0170,hdd_5,worker1-container-12-15 worker2-container-16-19 worker1-container-4-7 worker1-container-36-39 worker2-container-8-11 worker2-container-4-7 worker2-container-32-35 worker1-container-20-23 worker1-container-28-31 worker1-container-8-11
+1000-genome,run0164,hdd_5,worker1-container-12-15 worker2-container-16-19 worker1-container-8-11 worker2-container-8-11 worker2-container-4-7 worker1-container-20-23 worker2-container-32-35 worker1-container-28-31 worker1-container-4-7 worker1-container-36-39
+1000-genome,run0132,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker2-container-36-39 worker1-container-8-11
+1000-genome,run0178,hdd_5,worker2-container-8-11 worker1-container-36-39 worker2-container-4-7 worker1-container-28-31 worker2-container-32-35 worker1-container-8-11 worker1-container-20-23 worker2-container-16-19 worker1-container-12-15 worker1-container-4-7
+1000-genome,run0111,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker2-container-36-39
+1000-genome,run0189,hdd_5,worker1-container-28-31 worker2-container-24-27 worker2-container-28-31 worker1-container-12-15 worker2-container-32-35 worker1-container-16-19 worker1-container-20-23 worker1-container-24-27 worker2-container-20-23 worker1-container-4-7 worker2-container-36-39 worker1-container-8-11 worker2-container-4-7 worker2-container-12-15 worker2-container-8-11
+1000-genome,run0108,hdd_5,worker1-container-32-35 worker2-container-0-3 worker1-container-16-19 worker1-container-12-15 worker1-container-28-31
+1000-genome,run0119,hdd_5,worker2-container-32-35 worker2-container-12-15 worker1-container-8-11 worker2-container-36-39 worker1-container-12-15
+1000-genome,run0201,hdd_5,worker1-container-4-7 worker1-container-28-31 worker2-container-28-31 worker1-container-12-15 worker2-container-32-35 worker2-container-12-15 worker1-container-16-19 worker1-container-20-23 worker2-container-24-27 worker1-container-24-27 worker1-container-8-11 worker2-container-4-7 worker2-container-20-23 worker2-container-8-11 worker2-container-36-39
+1000-genome,run0166,hdd_5,worker2-container-8-11 worker1-container-12-15 worker1-container-28-31 worker2-container-4-7 worker1-container-20-23 worker2-container-16-19 worker1-container-4-7 worker2-container-32-35 worker1-container-8-11 worker1-container-36-39
+1000-genome,run0103,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-16-19 worker1-container-12-15 worker1-container-28-31
+1000-genome,run0090,hdd_5,worker2-container-0-3 worker1-container-32-35 worker1-container-28-31 worker1-container-16-19 worker1-container-12-15
+1000-genome,run0185,hdd_5,worker2-container-20-23 worker1-container-28-31 worker2-container-28-31 worker1-container-12-15 worker2-container-4-7 worker1-container-20-23 worker2-container-36-39 worker2-container-24-27 worker2-container-32-35 worker1-container-24-27 worker1-container-8-11 worker2-container-12-15 worker2-container-8-11 worker1-container-4-7 worker1-container-16-19
+1000-genome,run0195,hdd_5,worker2-container-8-11 worker1-container-8-11 worker1-container-16-19 worker2-container-4-7 worker1-container-20-23 worker2-container-32-35 worker1-container-12-15 worker1-container-24-27 worker2-container-24-27 worker2-container-36-39 worker1-container-4-7 worker1-container-28-31 worker2-container-12-15 worker2-container-20-23 worker2-container-28-31
+1000-genome,run0187,hdd_5,worker2-container-24-27 worker1-container-12-15 worker2-container-12-15 worker2-container-28-31 worker1-container-20-23 worker1-container-16-19 worker1-container-4-7 worker1-container-24-27 worker2-container-36-39 worker1-container-8-11 worker2-container-8-11 worker2-container-4-7 worker2-container-20-23 worker1-container-28-31 worker2-container-32-35
+1000-genome,run0128,hdd_5,worker2-container-12-15 worker2-container-32-35 worker1-container-8-11 worker2-container-36-39 worker1-container-12-15
+1000-genome,run0358,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0254,hdd_10,worker1-container-24-27 worker2-container-4-7 worker1-container-32-35 worker2-container-32-35 worker1-container-16-19 worker2-container-28-31 worker1-container-8-11 worker2-container-12-15 worker2-container-20-23 worker1-container-20-23
+1000-genome,run0257,hdd_10,worker1-container-16-19 worker1-container-20-23 worker2-container-32-35 worker1-container-32-35 worker1-container-24-27 worker2-container-12-15 worker2-container-20-23 worker2-container-4-7 worker2-container-28-31 worker1-container-8-11
+1000-genome,run0225,hdd_10,worker1-container-32-35 worker2-container-28-31 worker2-container-0-3 worker2-container-12-15 worker2-container-32-35 worker1-container-16-19 worker1-container-12-15 worker2-container-24-27 worker1-container-28-31 worker1-container-0-3 worker1-container-36-39 worker2-container-36-39 worker2-container-16-19 worker1-container-20-23 worker1-container-24-27
+1000-genome,run0242,hdd_10,worker1-container-8-11 worker1-container-24-27 worker2-container-4-7 worker1-container-32-35 worker2-container-32-35 worker2-container-28-31 worker2-container-12-15 worker1-container-20-23 worker2-container-20-23 worker1-container-16-19
+1000-genome,run0339,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0221,hdd_10,worker1-container-20-23 worker2-container-16-19 worker2-container-0-3 worker2-container-28-31 worker2-container-12-15 worker1-container-0-3 worker2-container-32-35 worker1-container-16-19 worker1-container-24-27 worker1-container-32-35 worker1-container-36-39 worker1-container-28-31 worker2-container-36-39 worker2-container-24-27 worker1-container-12-15
+1000-genome,run0249,hdd_10,worker1-container-20-23 worker1-container-8-11 worker2-container-4-7 worker1-container-16-19 worker1-container-24-27 worker2-container-28-31 worker2-container-20-23 worker2-container-12-15 worker1-container-32-35 worker2-container-32-35
+1000-genome,run0237,hdd_10,worker1-container-32-35 worker1-container-24-27 worker2-container-32-35 worker1-container-20-23 worker2-container-4-7 worker1-container-8-11 worker2-container-20-23 worker2-container-28-31 worker1-container-16-19 worker2-container-12-15
+1000-genome,run0340,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0233,hdd_10,worker1-container-24-27 worker2-container-0-3 worker2-container-28-31 worker2-container-12-15 worker2-container-32-35 worker1-container-12-15 worker2-container-36-39 worker2-container-16-19 worker1-container-32-35 worker1-container-20-23 worker1-container-28-31 worker1-container-36-39 worker1-container-16-19 worker2-container-24-27 worker1-container-0-3
+1000-genome,run0336,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0255,hdd_10,worker1-container-8-11 worker2-container-4-7 worker2-container-32-35 worker1-container-32-35 worker1-container-24-27 worker2-container-20-23 worker2-container-28-31 worker1-container-16-19 worker2-container-12-15 worker1-container-20-23
+1000-genome,run0240,hdd_10,worker1-container-24-27 worker2-container-12-15 worker2-container-32-35 worker1-container-32-35 worker1-container-20-23 worker2-container-28-31 worker2-container-4-7 worker2-container-20-23 worker1-container-8-11 worker1-container-16-19
+1000-genome,run0230,hdd_10,worker2-container-16-19 worker2-container-0-3 worker1-container-16-19 worker2-container-12-15 worker1-container-12-15 worker2-container-28-31 worker2-container-36-39 worker1-container-28-31 worker1-container-32-35 worker1-container-36-39 worker1-container-20-23 worker2-container-24-27 worker1-container-0-3 worker1-container-24-27 worker2-container-32-35
+1000-genome,run0258,hdd_10,worker2-container-32-35 worker1-container-8-11 worker1-container-24-27 worker2-container-28-31 worker2-container-4-7 worker1-container-32-35 worker2-container-12-15 worker1-container-20-23 worker1-container-16-19 worker2-container-20-23
+1000-genome,run0251,hdd_10,worker2-container-4-7 worker1-container-16-19 worker1-container-20-23 worker2-container-12-15 worker1-container-32-35 worker1-container-24-27 worker2-container-32-35 worker2-container-28-31 worker1-container-8-11 worker2-container-20-23
+1000-genome,run0223,hdd_10,worker1-container-36-39 worker2-container-0-3 worker2-container-12-15 worker1-container-0-3 worker2-container-28-31 worker1-container-24-27 worker1-container-16-19 worker2-container-32-35 worker1-container-20-23 worker1-container-28-31 worker1-container-32-35 worker2-container-36-39 worker2-container-24-27 worker2-container-16-19 worker1-container-12-15
+1000-genome,run0228,hdd_10,worker2-container-0-3 worker1-container-24-27 worker1-container-32-35 worker2-container-28-31 worker2-container-12-15 worker2-container-32-35 worker2-container-24-27 worker1-container-12-15 worker1-container-20-23 worker1-container-36-39 worker1-container-28-31 worker1-container-16-19 worker2-container-36-39 worker2-container-16-19 worker1-container-0-3
+1000-genome,run0350,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0355,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0241,hdd_10,worker2-container-4-7 worker1-container-32-35 worker2-container-32-35 worker1-container-8-11 worker2-container-12-15 worker1-container-24-27 worker2-container-28-31 worker2-container-20-23 worker1-container-16-19 worker1-container-20-23
+1000-genome,run0344,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0213,hdd_10,worker2-container-0-3 worker1-container-0-3 worker1-container-24-27 worker2-container-12-15 worker1-container-16-19 worker2-container-28-31 worker1-container-32-35 worker1-container-12-15 worker1-container-20-23 worker1-container-28-31 worker2-container-36-39 worker2-container-24-27 worker2-container-16-19 worker1-container-36-39 worker2-container-32-35
+1000-genome,run0346,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0341,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0256,hdd_10,worker1-container-16-19 worker1-container-20-23 worker2-container-4-7 worker1-container-8-11 worker1-container-24-27 worker2-container-12-15 worker2-container-32-35 worker2-container-20-23 worker1-container-32-35 worker2-container-28-31
+1000-genome,run0247,hdd_10,worker2-container-28-31 worker2-container-12-15 worker2-container-4-7 worker2-container-32-35 worker2-container-20-23 worker1-container-8-11 worker1-container-20-23 worker1-container-16-19 worker1-container-32-35 worker1-container-24-27
+1000-genome,run0216,hdd_10,worker2-container-28-31 worker2-container-0-3 worker1-container-16-19 worker1-container-24-27 worker1-container-20-23 worker2-container-32-35 worker2-container-16-19 worker1-container-32-35 worker1-container-12-15 worker1-container-36-39 worker1-container-28-31 worker2-container-36-39 worker2-container-24-27 worker1-container-0-3 worker2-container-12-15
+1000-genome,run0239,hdd_10,worker1-container-24-27 worker1-container-20-23 worker2-container-12-15 worker2-container-4-7 worker1-container-16-19 worker2-container-28-31 worker1-container-8-11 worker2-container-20-23 worker1-container-32-35 worker2-container-32-35
+1000-genome,run0348,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0212,hdd_10,worker2-container-16-19 worker2-container-0-3 worker2-container-28-31 worker1-container-16-19 worker2-container-12-15 worker1-container-0-3 worker2-container-32-35 worker1-container-32-35 worker1-container-20-23 worker1-container-36-39 worker1-container-12-15 worker2-container-36-39 worker2-container-24-27 worker1-container-28-31 worker1-container-24-27
+1000-genome,run0238,hdd_10,worker1-container-20-23 worker2-container-4-7 worker2-container-32-35 worker2-container-12-15 worker2-container-28-31 worker1-container-16-19 worker1-container-8-11 worker1-container-32-35 worker2-container-20-23 worker1-container-24-27
+1000-genome,run0217,hdd_10,worker2-container-0-3 worker1-container-24-27 worker2-container-28-31 worker1-container-16-19 worker1-container-0-3 worker2-container-32-35 worker1-container-32-35 worker1-container-12-15 worker1-container-20-23 worker1-container-28-31 worker2-container-36-39 worker2-container-24-27 worker2-container-16-19 worker1-container-36-39 worker2-container-12-15
+1000-genome,run0248,hdd_10,worker2-container-20-23 worker1-container-20-23 worker2-container-4-7 worker2-container-28-31 worker2-container-12-15 worker1-container-16-19 worker2-container-32-35 worker1-container-24-27 worker1-container-8-11 worker1-container-32-35
+1000-genome,run0218,hdd_10,worker2-container-16-19 worker2-container-0-3 worker2-container-28-31 worker2-container-12-15 worker1-container-0-3 worker1-container-16-19 worker1-container-24-27 worker1-container-32-35 worker1-container-36-39 worker1-container-12-15 worker1-container-20-23 worker2-container-36-39 worker2-container-24-27 worker1-container-28-31 worker2-container-32-35
+1000-genome,run0211,hdd_10,worker2-container-0-3 worker2-container-28-31 worker1-container-24-27 worker2-container-12-15 worker2-container-32-35 worker1-container-16-19 worker1-container-0-3 worker1-container-12-15 worker2-container-36-39 worker2-container-24-27 worker1-container-28-31 worker1-container-20-23 worker1-container-32-35 worker2-container-16-19 worker1-container-36-39
+1000-genome,run0226,hdd_10,worker2-container-0-3 worker1-container-24-27 worker1-container-36-39 worker2-container-28-31 worker2-container-12-15 worker1-container-12-15 worker2-container-32-35 worker1-container-0-3 worker1-container-28-31 worker1-container-32-35 worker2-container-36-39 worker2-container-24-27 worker2-container-16-19 worker1-container-16-19 worker1-container-20-23
+1000-genome,run0352,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0224,hdd_10,worker1-container-24-27 worker1-container-32-35 worker2-container-28-31 worker2-container-12-15 worker2-container-24-27 worker1-container-16-19 worker1-container-20-23 worker1-container-0-3 worker2-container-0-3 worker1-container-12-15 worker1-container-36-39 worker2-container-36-39 worker2-container-16-19 worker1-container-28-31 worker2-container-32-35
+1000-genome,run0357,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0244,hdd_10,worker1-container-20-23 worker2-container-32-35 worker1-container-24-27 worker2-container-4-7 worker1-container-8-11 worker2-container-12-15 worker2-container-20-23 worker2-container-28-31 worker1-container-16-19 worker1-container-32-35
+1000-genome,run0345,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0229,hdd_10,worker2-container-16-19 worker2-container-0-3 worker2-container-28-31 worker2-container-12-15 worker1-container-20-23 worker1-container-0-3 worker2-container-36-39 worker1-container-12-15 worker1-container-36-39 worker1-container-24-27 worker1-container-28-31 worker1-container-16-19 worker2-container-24-27 worker1-container-32-35 worker2-container-32-35
+1000-genome,run0334,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0245,hdd_10,worker1-container-16-19 worker1-container-24-27 worker2-container-12-15 worker1-container-8-11 worker1-container-20-23 worker2-container-32-35 worker2-container-28-31 worker2-container-20-23 worker1-container-32-35 worker2-container-4-7
+1000-genome,run0246,hdd_10,worker2-container-4-7 worker1-container-32-35 worker1-container-20-23 worker1-container-24-27 worker2-container-20-23 worker2-container-28-31 worker1-container-16-19 worker1-container-8-11 worker2-container-12-15 worker2-container-32-35
+1000-genome,run0222,hdd_10,worker1-container-32-35 worker2-container-36-39 worker2-container-16-19 worker2-container-0-3 worker1-container-0-3 worker2-container-12-15 worker1-container-24-27 worker2-container-24-27 worker2-container-32-35 worker1-container-20-23 worker1-container-12-15 worker1-container-36-39 worker1-container-16-19 worker1-container-28-31 worker2-container-28-31
+1000-genome,run0253,hdd_10,worker1-container-32-35 worker1-container-8-11 worker2-container-32-35 worker1-container-16-19 worker2-container-4-7 worker2-container-20-23 worker2-container-12-15 worker1-container-24-27 worker2-container-28-31 worker1-container-20-23
+1000-genome,run0220,hdd_10,worker2-container-16-19 worker1-container-16-19 worker2-container-0-3 worker1-container-24-27 worker1-container-0-3 worker2-container-28-31 worker2-container-12-15 worker1-container-28-31 worker1-container-36-39 worker1-container-12-15 worker1-container-20-23 worker2-container-36-39 worker2-container-24-27 worker1-container-32-35 worker2-container-32-35
+1000-genome,run0351,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0342,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0252,hdd_10,worker1-container-20-23 worker2-container-4-7 worker2-container-12-15 worker2-container-32-35 worker2-container-28-31 worker1-container-8-11 worker1-container-16-19 worker2-container-20-23 worker1-container-32-35 worker1-container-24-27
+1000-genome,run0214,hdd_10,worker2-container-16-19 worker2-container-0-3 worker1-container-20-23 worker2-container-28-31 worker1-container-0-3 worker2-container-12-15 worker1-container-12-15 worker2-container-32-35 worker1-container-36-39 worker1-container-28-31 worker1-container-24-27 worker2-container-36-39 worker1-container-16-19 worker2-container-24-27 worker1-container-32-35
+1000-genome,run0227,hdd_10,worker1-container-16-19 worker2-container-0-3 worker2-container-24-27 worker2-container-28-31 worker2-container-12-15 worker1-container-24-27 worker2-container-32-35 worker1-container-12-15 worker1-container-20-23 worker1-container-36-39 worker1-container-28-31 worker2-container-36-39 worker1-container-32-35 worker2-container-16-19 worker1-container-0-3
+1000-genome,run0243,hdd_10,worker2-container-32-35 worker1-container-20-23 worker2-container-12-15 worker1-container-32-35 worker1-container-24-27 worker2-container-4-7 worker2-container-28-31 worker2-container-20-23 worker1-container-8-11 worker1-container-16-19
+1000-genome,run0353,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0235,hdd_10,worker1-container-32-35 worker2-container-4-7 worker1-container-20-23 worker2-container-32-35 worker2-container-12-15 worker1-container-24-27 worker1-container-16-19 worker2-container-20-23 worker2-container-28-31 worker1-container-8-11
+1000-genome,run0349,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0343,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0215,hdd_10,worker2-container-16-19 worker1-container-32-35 worker2-container-0-3 worker2-container-12-15 worker1-container-24-27 worker2-container-28-31 worker1-container-28-31 worker2-container-24-27 worker1-container-0-3 worker1-container-36-39 worker1-container-12-15 worker2-container-36-39 worker1-container-16-19 worker1-container-20-23 worker2-container-32-35
+1000-genome,run0209,hdd_10,worker1-container-36-39 worker1-container-24-27 worker2-container-12-15 worker2-container-28-31 worker1-container-16-19 worker2-container-32-35 worker2-container-0-3 worker1-container-12-15 worker1-container-28-31 worker1-container-32-35 worker2-container-36-39 worker2-container-16-19 worker2-container-24-27 worker1-container-20-23 worker1-container-0-3
+1000-genome,run0234,hdd_10,worker1-container-24-27 worker2-container-4-7 worker1-container-20-23 worker1-container-8-11 worker2-container-32-35 worker2-container-12-15 worker2-container-28-31 worker2-container-20-23 worker1-container-16-19 worker1-container-32-35
+1000-genome,run0347,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0219,hdd_10,worker1-container-20-23 worker1-container-24-27 worker2-container-0-3 worker2-container-12-15 worker2-container-28-31 worker2-container-24-27 worker1-container-16-19 worker1-container-28-31 worker2-container-32-35 worker1-container-36-39 worker1-container-32-35 worker2-container-36-39 worker2-container-16-19 worker1-container-12-15 worker1-container-0-3
+1000-genome,run0337,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0338,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0231,hdd_10,worker2-container-28-31 worker1-container-32-35 worker1-container-24-27 worker2-container-12-15 worker1-container-16-19 worker1-container-12-15 worker2-container-0-3 worker2-container-16-19 worker2-container-32-35 worker2-container-36-39 worker1-container-28-31 worker1-container-0-3 worker2-container-24-27 worker1-container-36-39 worker1-container-20-23
+1000-genome,run0335,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0250,hdd_10,worker2-container-20-23 worker1-container-16-19 worker2-container-4-7 worker2-container-32-35 worker2-container-12-15 worker1-container-20-23 worker1-container-24-27 worker2-container-28-31 worker1-container-8-11 worker1-container-32-35
+1000-genome,run0232,hdd_10,worker2-container-16-19 worker2-container-0-3 worker1-container-24-27 worker2-container-28-31 worker1-container-0-3 worker2-container-12-15 worker2-container-32-35 worker2-container-36-39 worker1-container-28-31 worker1-container-36-39 worker1-container-32-35 worker1-container-20-23 worker1-container-16-19 worker2-container-24-27 worker1-container-12-15
+1000-genome,run0236,hdd_10,worker2-container-4-7 worker1-container-20-23 worker2-container-20-23 worker2-container-12-15 worker2-container-32-35 worker1-container-8-11 worker2-container-28-31 worker1-container-24-27 worker1-container-32-35 worker1-container-16-19
+1000-genome,run0354,hdd_10,worker1-container-32-35 worker1-container-8-11
+1000-genome,run0356,hdd_10,worker1-container-8-11 worker1-container-32-35
+1000-genome,run0210,hdd_10,worker2-container-24-27 worker2-container-0-3 worker1-container-0-3 worker2-container-28-31 worker2-container-12-15 worker2-container-32-35 worker1-container-24-27 worker1-container-12-15 worker1-container-20-23 worker2-container-36-39 worker1-container-28-31 worker1-container-32-35 worker1-container-36-39 worker1-container-16-19 worker2-container-16-19
+1000-genome,run0049,normal,
+1000-genome,run0022,normal,
+1000-genome,run0031,normal,
+1000-genome,run0030,normal,
+1000-genome,run0048,normal,
+1000-genome,run0033,normal,
+1000-genome,run0042,normal,
+1000-genome,run0013,normal,
+1000-genome,run0056,normal,
+1000-genome,run0026,normal,
+1000-genome,run0029,normal,
+1000-genome,run0016,normal,
+1000-genome,run0039,normal,
+1000-genome,run0366,normal,
+1000-genome,run0028,normal,
+1000-genome,run0027,normal,
+1000-genome,run0040,normal,
+1000-genome,run0036,normal,
+1000-genome,run0044,normal,
+1000-genome,run0043,normal,
+1000-genome,run0011,normal,
+1000-genome,run0021,normal,
+1000-genome,run0045,normal,
+1000-genome,run0054,normal,
+1000-genome,run0053,normal,
+1000-genome,run0035,normal,
+1000-genome,run0052,normal,
+1000-genome,run0014,normal,
+1000-genome,run0017,normal,
+1000-genome,run0019,normal,
+1000-genome,run0058,normal,
+1000-genome,run0012,normal,
+1000-genome,run0025,normal,
+1000-genome,run0038,normal,
+1000-genome,run0032,normal,
+1000-genome,run0050,normal,
+1000-genome,run0046,normal,
+1000-genome,run0015,normal,
+1000-genome,run0034,normal,
+1000-genome,run0023,normal,
+1000-genome,run0018,normal,
+1000-genome,run0051,normal,
+1000-genome,run0037,normal,
+1000-genome,run0024,normal,
+1000-genome,run0055,normal,
+1000-genome,run0041,normal,
+1000-genome,run0010,normal,
+1000-genome,run0009,normal,
+1000-genome,run0020,normal,
+1000-genome,run0047,normal,
+1000-genome,run0057,normal,
+1000-genome,run0333,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0281,cpu_2,worker1-container-28-31 worker2-container-16-19 worker1-container-8-11 worker2-container-28-31 worker2-container-12-15 worker2-container-32-35 worker1-container-12-15 worker1-container-0-3 worker1-container-32-35 worker2-container-8-11
+1000-genome,run0292,cpu_2,worker2-container-8-11 worker1-container-24-27 worker2-container-28-31 worker1-container-8-11 worker2-container-20-23 worker2-container-12-15 worker2-container-36-39 worker2-container-24-27 worker1-container-32-35 worker1-container-16-19 worker1-container-0-3 worker2-container-16-19 worker1-container-28-31 worker2-container-4-7 worker1-container-12-15
+1000-genome,run0304,cpu_2,worker2-container-20-23 worker2-container-12-15 worker2-container-8-11 worker2-container-36-39 worker1-container-32-35 worker2-container-28-31 worker1-container-12-15 worker1-container-16-19 worker1-container-8-11 worker1-container-0-3 worker1-container-28-31 worker1-container-24-27 worker2-container-24-27 worker2-container-16-19 worker2-container-4-7
+1000-genome,run0311,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0312,cpu_2,worker1-container-8-11 worker1-container-36-39
+1000-genome,run0078,cpu_2,worker1-container-4-7 worker2-container-24-27 worker2-container-4-7 worker1-container-20-23 worker2-container-8-11
+1000-genome,run0081,cpu_2,worker2-container-4-7 worker1-container-4-7 worker2-container-24-27 worker1-container-20-23 worker2-container-8-11
+1000-genome,run0313,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0061,cpu_2,worker1-container-4-7 worker2-container-24-27 worker1-container-20-23 worker2-container-4-7 worker2-container-8-11
+1000-genome,run0301,cpu_2,worker2-container-36-39 worker1-container-16-19 worker2-container-28-31 worker2-container-12-15 worker2-container-4-7 worker2-container-8-11 worker1-container-8-11 worker2-container-16-19 worker1-container-12-15 worker2-container-20-23 worker1-container-0-3 worker1-container-32-35 worker1-container-24-27 worker2-container-24-27 worker1-container-28-31
+1000-genome,run0079,cpu_2,worker2-container-24-27 worker1-container-4-7 worker1-container-20-23 worker2-container-4-7 worker2-container-8-11
+1000-genome,run0068,cpu_2,worker2-container-4-7 worker2-container-24-27 worker2-container-8-11 worker1-container-4-7 worker1-container-20-23
+1000-genome,run0289,cpu_2,worker1-container-32-35 worker2-container-8-11 worker1-container-16-19 worker2-container-12-15 worker2-container-28-31 worker2-container-20-23 worker2-container-4-7 worker1-container-28-31 worker2-container-24-27 worker1-container-12-15 worker1-container-8-11 worker1-container-0-3 worker1-container-24-27 worker2-container-16-19 worker2-container-36-39
+1000-genome,run0284,cpu_2,worker2-container-36-39 worker2-container-28-31 worker2-container-16-19 worker2-container-20-23 worker2-container-8-11 worker2-container-4-7 worker2-container-12-15 worker2-container-24-27 worker1-container-24-27 worker1-container-16-19 worker1-container-8-11 worker1-container-0-3 worker1-container-12-15 worker1-container-32-35 worker1-container-28-31
+1000-genome,run0259,cpu_2,worker1-container-32-35 worker2-container-8-11 worker1-container-28-31 worker2-container-28-31 worker1-container-8-11 worker1-container-12-15 worker1-container-0-3 worker2-container-16-19 worker2-container-32-35 worker2-container-12-15
+1000-genome,run0070,cpu_2,worker2-container-4-7 worker2-container-24-27 worker2-container-8-11 worker1-container-4-7 worker1-container-20-23
+1000-genome,run0331,cpu_2,worker1-container-8-11 worker1-container-36-39
+1000-genome,run0291,cpu_2,worker1-container-32-35 worker2-container-28-31 worker2-container-12-15 worker1-container-8-11 worker1-container-16-19 worker2-container-4-7 worker1-container-28-31 worker2-container-8-11 worker2-container-36-39 worker2-container-20-23 worker2-container-24-27 worker1-container-0-3 worker2-container-16-19 worker1-container-24-27 worker1-container-12-15
+1000-genome,run0302,cpu_2,worker1-container-16-19 worker2-container-28-31 worker2-container-8-11 worker1-container-24-27 worker1-container-32-35 worker2-container-24-27 worker2-container-4-7 worker2-container-36-39 worker1-container-8-11 worker1-container-12-15 worker1-container-0-3 worker2-container-12-15 worker2-container-20-23 worker2-container-16-19 worker1-container-28-31
+1000-genome,run0073,cpu_2,worker1-container-4-7 worker1-container-20-23 worker2-container-8-11 worker2-container-4-7 worker2-container-24-27
+1000-genome,run0064,cpu_2,worker2-container-4-7 worker2-container-24-27 worker1-container-4-7 worker2-container-8-11 worker1-container-20-23
+1000-genome,run0310,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0270,cpu_2,worker1-container-12-15 worker2-container-16-19 worker1-container-28-31 worker1-container-8-11 worker2-container-8-11 worker1-container-32-35 worker2-container-32-35 worker2-container-12-15 worker1-container-0-3 worker2-container-28-31
+1000-genome,run0305,cpu_2,worker1-container-28-31 worker1-container-8-11 worker1-container-16-19 worker2-container-8-11 worker2-container-28-31 worker2-container-4-7 worker2-container-12-15 worker1-container-24-27 worker2-container-36-39 worker1-container-12-15 worker1-container-0-3 worker1-container-32-35 worker2-container-16-19 worker2-container-24-27 worker2-container-20-23
+1000-genome,run0286,cpu_2,worker1-container-16-19 worker1-container-0-3 worker1-container-24-27 worker1-container-8-11 worker2-container-16-19 worker2-container-4-7 worker2-container-8-11 worker2-container-20-23 worker2-container-36-39 worker1-container-28-31 worker2-container-12-15 worker1-container-12-15 worker1-container-32-35 worker2-container-24-27 worker2-container-28-31
+1000-genome,run0298,cpu_2,worker1-container-32-35 worker1-container-16-19 worker1-container-28-31 worker2-container-12-15 worker1-container-8-11 worker2-container-4-7 worker2-container-36-39 worker2-container-8-11 worker2-container-20-23 worker1-container-12-15 worker1-container-0-3 worker1-container-24-27 worker2-container-24-27 worker2-container-16-19 worker2-container-28-31
+1000-genome,run0280,cpu_2,worker1-container-28-31 worker2-container-16-19 worker1-container-32-35 worker2-container-8-11 worker2-container-28-31 worker2-container-12-15 worker2-container-32-35 worker1-container-0-3 worker1-container-12-15 worker1-container-8-11
+1000-genome,run0067,cpu_2,worker2-container-4-7 worker1-container-4-7 worker2-container-24-27 worker1-container-20-23 worker2-container-8-11
+1000-genome,run0264,cpu_2,worker1-container-0-3 worker1-container-28-31 worker1-container-32-35 worker2-container-28-31 worker2-container-8-11 worker2-container-12-15 worker1-container-8-11 worker1-container-12-15 worker2-container-16-19 worker2-container-32-35
+1000-genome,run0082,cpu_2,worker2-container-24-27 worker1-container-4-7 worker1-container-20-23 worker2-container-4-7 worker2-container-8-11
+1000-genome,run0309,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0306,cpu_2,worker2-container-4-7 worker2-container-12-15 worker2-container-28-31 worker2-container-8-11 worker1-container-32-35 worker2-container-36-39 worker1-container-24-27 worker1-container-12-15 worker2-container-20-23 worker1-container-8-11 worker2-container-24-27 worker1-container-0-3 worker2-container-16-19 worker1-container-28-31 worker1-container-16-19
+1000-genome,run0269,cpu_2,worker2-container-16-19 worker1-container-32-35 worker1-container-8-11 worker2-container-28-31 worker2-container-32-35 worker1-container-28-31 worker2-container-12-15 worker1-container-12-15 worker1-container-0-3 worker2-container-8-11
+1000-genome,run0329,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0265,cpu_2,worker2-container-16-19 worker2-container-8-11 worker1-container-28-31 worker2-container-28-31 worker1-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-0-3 worker2-container-32-35 worker1-container-8-11
+1000-genome,run0060,cpu_2,worker1-container-4-7 worker2-container-24-27 worker2-container-8-11 worker2-container-4-7 worker1-container-20-23
+1000-genome,run0274,cpu_2,worker1-container-0-3 worker1-container-8-11 worker2-container-8-11 worker1-container-32-35 worker2-container-28-31 worker2-container-16-19 worker2-container-12-15 worker1-container-12-15 worker2-container-32-35 worker1-container-28-31
+1000-genome,run0279,cpu_2,worker2-container-8-11 worker1-container-32-35 worker1-container-28-31 worker2-container-28-31 worker2-container-12-15 worker2-container-32-35 worker2-container-16-19 worker1-container-12-15 worker1-container-0-3 worker1-container-8-11
+1000-genome,run0287,cpu_2,worker1-container-24-27 worker2-container-4-7 worker2-container-16-19 worker1-container-28-31 worker1-container-12-15 worker1-container-8-11 worker2-container-20-23 worker2-container-8-11 worker2-container-28-31 worker2-container-36-39 worker2-container-12-15 worker2-container-24-27 worker1-container-0-3 worker1-container-32-35 worker1-container-16-19
+1000-genome,run0297,cpu_2,worker2-container-12-15 worker2-container-16-19 worker1-container-32-35 worker1-container-28-31 worker1-container-12-15 worker2-container-4-7 worker2-container-36-39 worker2-container-28-31 worker1-container-16-19 worker1-container-8-11 worker2-container-8-11 worker2-container-24-27 worker1-container-0-3 worker1-container-24-27 worker2-container-20-23
+1000-genome,run0069,cpu_2,worker1-container-4-7 worker1-container-20-23 worker2-container-8-11 worker2-container-24-27 worker2-container-4-7
+1000-genome,run0278,cpu_2,worker1-container-28-31 worker2-container-8-11 worker1-container-8-11 worker2-container-28-31 worker2-container-32-35 worker1-container-12-15 worker1-container-0-3 worker2-container-16-19 worker2-container-12-15 worker1-container-32-35
+1000-genome,run0288,cpu_2,worker1-container-0-3 worker1-container-28-31 worker2-container-16-19 worker1-container-8-11 worker2-container-4-7 worker2-container-28-31 worker1-container-12-15 worker1-container-16-19 worker2-container-8-11 worker2-container-12-15 worker2-container-24-27 worker2-container-36-39 worker1-container-32-35 worker1-container-24-27 worker2-container-20-23
+1000-genome,run0268,cpu_2,worker1-container-0-3 worker1-container-32-35 worker1-container-28-31 worker1-container-8-11 worker2-container-8-11 worker2-container-28-31 worker2-container-12-15 worker1-container-12-15 worker2-container-16-19 worker2-container-32-35
+1000-genome,run0308,cpu_2,worker1-container-28-31 worker1-container-16-19 worker1-container-8-11 worker1-container-24-27 worker2-container-28-31 worker2-container-12-15 worker2-container-20-23 worker2-container-16-19 worker2-container-8-11 worker1-container-12-15 worker2-container-24-27 worker1-container-0-3 worker2-container-36-39 worker2-container-4-7 worker1-container-32-35
+1000-genome,run0275,cpu_2,worker2-container-16-19 worker1-container-32-35 worker1-container-8-11 worker2-container-28-31 worker1-container-12-15 worker1-container-28-31 worker2-container-12-15 worker1-container-0-3 worker2-container-32-35 worker2-container-8-11
+1000-genome,run0071,cpu_2,worker1-container-4-7 worker1-container-20-23 worker2-container-4-7 worker2-container-24-27 worker2-container-8-11
+1000-genome,run0262,cpu_2,worker2-container-16-19 worker1-container-0-3 worker1-container-28-31 worker1-container-8-11 worker2-container-28-31 worker2-container-12-15 worker2-container-32-35 worker1-container-12-15 worker1-container-32-35 worker2-container-8-11
+1000-genome,run0263,cpu_2,worker1-container-28-31 worker1-container-32-35 worker1-container-0-3 worker1-container-8-11 worker2-container-12-15 worker2-container-8-11 worker1-container-12-15 worker2-container-32-35 worker2-container-16-19 worker2-container-28-31
+1000-genome,run0326,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0300,cpu_2,worker2-container-8-11 worker2-container-28-31 worker1-container-0-3 worker2-container-36-39 worker1-container-32-35 worker2-container-12-15 worker1-container-24-27 worker2-container-16-19 worker2-container-24-27 worker1-container-16-19 worker2-container-20-23 worker1-container-12-15 worker1-container-8-11 worker2-container-4-7 worker1-container-28-31
+1000-genome,run0283,cpu_2,worker2-container-16-19 worker2-container-8-11 worker2-container-28-31 worker2-container-12-15 worker1-container-8-11 worker1-container-0-3 worker1-container-32-35 worker1-container-12-15 worker2-container-32-35 worker1-container-28-31
+1000-genome,run0276,cpu_2,worker1-container-32-35 worker2-container-16-19 worker2-container-8-11 worker2-container-28-31 worker2-container-32-35 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker1-container-0-3 worker1-container-28-31
+1000-genome,run0077,cpu_2,worker2-container-24-27 worker1-container-20-23 worker1-container-4-7 worker2-container-8-11 worker2-container-4-7
+1000-genome,run0293,cpu_2,worker1-container-12-15 worker2-container-4-7 worker2-container-16-19 worker2-container-20-23 worker1-container-8-11 worker1-container-24-27 worker2-container-28-31 worker1-container-16-19 worker1-container-32-35 worker2-container-24-27 worker2-container-36-39 worker1-container-0-3 worker2-container-8-11 worker2-container-12-15 worker1-container-28-31
+1000-genome,run0065,cpu_2,worker1-container-4-7 worker2-container-24-27 worker2-container-8-11 worker2-container-4-7 worker1-container-20-23
+1000-genome,run0296,cpu_2,worker1-container-16-19 worker2-container-16-19 worker2-container-8-11 worker1-container-32-35 worker2-container-28-31 worker2-container-36-39 worker1-container-8-11 worker1-container-28-31 worker2-container-24-27 worker1-container-0-3 worker1-container-12-15 worker1-container-24-27 worker2-container-12-15 worker2-container-20-23 worker2-container-4-7
+1000-genome,run0273,cpu_2,worker2-container-16-19 worker1-container-32-35 worker1-container-8-11 worker2-container-8-11 worker2-container-28-31 worker2-container-32-35 worker1-container-12-15 worker1-container-0-3 worker1-container-28-31 worker2-container-12-15
+1000-genome,run0285,cpu_2,worker1-container-28-31 worker1-container-16-19 worker1-container-32-35 worker2-container-4-7 worker2-container-16-19 worker1-container-8-11 worker2-container-28-31 worker2-container-24-27 worker1-container-12-15 worker2-container-36-39 worker1-container-0-3 worker2-container-8-11 worker1-container-24-27 worker2-container-12-15 worker2-container-20-23
+1000-genome,run0320,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0282,cpu_2,worker1-container-28-31 worker2-container-16-19 worker1-container-32-35 worker2-container-28-31 worker2-container-8-11 worker2-container-32-35 worker1-container-8-11 worker1-container-12-15 worker1-container-0-3 worker2-container-12-15
+1000-genome,run0271,cpu_2,worker1-container-32-35 worker2-container-16-19 worker2-container-8-11 worker2-container-28-31 worker2-container-32-35 worker2-container-12-15 worker1-container-0-3 worker1-container-28-31 worker1-container-12-15 worker1-container-8-11
+1000-genome,run0059,cpu_2,worker2-container-4-7 worker2-container-24-27 worker1-container-4-7 worker1-container-20-23 worker2-container-8-11
+1000-genome,run0295,cpu_2,worker2-container-8-11 worker2-container-12-15 worker1-container-28-31 worker1-container-8-11 worker1-container-32-35 worker2-container-20-23 worker2-container-28-31 worker1-container-12-15 worker1-container-16-19 worker2-container-36-39 worker1-container-0-3 worker2-container-16-19 worker2-container-4-7 worker2-container-24-27 worker1-container-24-27
+1000-genome,run0327,cpu_2,worker1-container-8-11 worker1-container-36-39
+1000-genome,run0319,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0321,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0316,cpu_2,worker1-container-8-11 worker1-container-36-39
+1000-genome,run0083,cpu_2,worker2-container-24-27 worker1-container-4-7 worker1-container-20-23 worker2-container-8-11 worker2-container-4-7
+1000-genome,run0072,cpu_2,worker2-container-4-7 worker1-container-4-7 worker2-container-8-11 worker2-container-24-27 worker1-container-20-23
+1000-genome,run0299,cpu_2,worker2-container-4-7 worker2-container-16-19 worker1-container-32-35 worker1-container-24-27 worker2-container-20-23 worker1-container-12-15 worker1-container-28-31 worker2-container-12-15 worker2-container-24-27 worker2-container-36-39 worker1-container-0-3 worker2-container-28-31 worker1-container-8-11 worker2-container-8-11 worker1-container-16-19
+1000-genome,run0294,cpu_2,worker1-container-32-35 worker2-container-4-7 worker2-container-36-39 worker1-container-28-31 worker1-container-12-15 worker2-container-28-31 worker2-container-20-23 worker1-container-16-19 worker1-container-8-11 worker1-container-0-3 worker2-container-8-11 worker1-container-24-27 worker2-container-16-19 worker2-container-24-27 worker2-container-12-15
+1000-genome,run0063,cpu_2,worker1-container-4-7 worker1-container-20-23 worker2-container-8-11 worker2-container-4-7 worker2-container-24-27
+1000-genome,run0266,cpu_2,worker1-container-28-31 worker1-container-8-11 worker2-container-28-31 worker2-container-8-11 worker2-container-32-35 worker1-container-12-15 worker2-container-12-15 worker1-container-0-3 worker1-container-32-35 worker2-container-16-19
+1000-genome,run0318,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0076,cpu_2,worker2-container-24-27 worker1-container-4-7 worker1-container-20-23 worker2-container-8-11 worker2-container-4-7
+1000-genome,run0315,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0303,cpu_2,worker2-container-36-39 worker2-container-4-7 worker2-container-8-11 worker2-container-28-31 worker1-container-28-31 worker2-container-24-27 worker2-container-20-23 worker2-container-16-19 worker2-container-12-15 worker1-container-16-19 worker1-container-0-3 worker1-container-24-27 worker1-container-32-35 worker1-container-12-15 worker1-container-8-11
+1000-genome,run0332,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0314,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0322,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0080,cpu_2,worker1-container-4-7 worker2-container-24-27 worker1-container-20-23 worker2-container-4-7 worker2-container-8-11
+1000-genome,run0074,cpu_2,worker1-container-4-7 worker2-container-24-27 worker2-container-4-7 worker2-container-8-11 worker1-container-20-23
+1000-genome,run0328,cpu_2,worker1-container-8-11 worker1-container-36-39
+1000-genome,run0277,cpu_2,worker1-container-32-35 worker1-container-28-31 worker1-container-8-11 worker2-container-28-31 worker1-container-12-15 worker2-container-16-19 worker2-container-32-35 worker1-container-0-3 worker2-container-12-15 worker2-container-8-11
+1000-genome,run0317,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0323,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0324,cpu_2,worker1-container-8-11 worker1-container-36-39
+1000-genome,run0330,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0261,cpu_2,worker2-container-16-19 worker1-container-12-15 worker2-container-8-11 worker2-container-32-35 worker2-container-28-31 worker2-container-12-15 worker1-container-0-3 worker1-container-32-35 worker1-container-28-31 worker1-container-8-11
+1000-genome,run0260,cpu_2,worker2-container-16-19 worker2-container-8-11 worker1-container-32-35 worker2-container-28-31 worker2-container-12-15 worker1-container-12-15 worker1-container-8-11 worker1-container-0-3 worker1-container-28-31 worker2-container-32-35
+1000-genome,run0075,cpu_2,worker2-container-4-7 worker1-container-4-7 worker2-container-24-27 worker2-container-8-11 worker1-container-20-23
+1000-genome,run0307,cpu_2,worker2-container-12-15 worker2-container-4-7 worker2-container-16-19 worker1-container-32-35 worker1-container-24-27 worker1-container-28-31 worker2-container-24-27 worker2-container-20-23 worker2-container-36-39 worker1-container-12-15 worker1-container-0-3 worker2-container-28-31 worker2-container-8-11 worker1-container-16-19 worker1-container-8-11
+1000-genome,run0066,cpu_2,worker1-container-4-7 worker2-container-24-27 worker1-container-20-23 worker2-container-8-11 worker2-container-4-7
+1000-genome,run0267,cpu_2,worker2-container-8-11 worker2-container-28-31 worker1-container-28-31 worker1-container-8-11 worker2-container-16-19 worker1-container-12-15 worker2-container-32-35 worker1-container-0-3 worker2-container-12-15 worker1-container-32-35
+1000-genome,run0272,cpu_2,worker1-container-32-35 worker2-container-8-11 worker1-container-8-11 worker2-container-32-35 worker2-container-28-31 worker1-container-12-15 worker2-container-12-15 worker1-container-0-3 worker1-container-28-31 worker2-container-16-19
+1000-genome,run0290,cpu_2,worker2-container-36-39 worker2-container-8-11 worker1-container-16-19 worker2-container-28-31 worker1-container-32-35 worker1-container-8-11 worker2-container-4-7 worker2-container-12-15 worker1-container-12-15 worker1-container-0-3 worker2-container-20-23 worker1-container-28-31 worker1-container-24-27 worker2-container-24-27 worker2-container-16-19
+1000-genome,run0325,cpu_2,worker1-container-36-39 worker1-container-8-11
+1000-genome,run0062,cpu_2,worker1-container-20-23 worker1-container-4-7 worker2-container-8-11 worker2-container-4-7 worker2-container-24-27

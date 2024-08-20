@@ -1,15 +1,13 @@
 """ PoSeiDon dataset wrapper as PyG.dataset.
 
-License: TBD
-
-NOTE:
-    * `1000genome_new_2022` and `montage` workflows are in `data_new` folder
-    * `1000genome_new_2022` and `montage` workflows only have `cpu` and `hdd` anomalies
+License: MIT
 """
 
 import glob
 import os
 import os.path as osp
+import pickle
+import random
 
 import networkx as nx
 import numpy as np
@@ -22,6 +20,28 @@ from psd_gnn.utils import create_dir, parse_adj
 
 
 class PSD_Dataset(InMemoryDataset):
+    """ Customized dataset for PoSeiDon graphs.
+
+    Args:
+        root (str, optional):           Root of the processed path.             Defaults to "./".
+        name (str, optional):           Name of the workflow type.              Defaults to "1000genome".
+        use_node_attr (bool, optional): Use node attributes.                    Defaults to False.
+        use_edge_attr (bool, optional): Use edge attributes.                    Defaults to False.
+        force_reprocess (bool, optional): Force to reprocess, will delete the cached file on disk.
+                                                                                Defaults to False.
+        node_level (bool, optional):    Process as node level graphs if `True`. Defaults to False.
+        binary_labels (bool, optional): Binary labels.                          Defaults to False.
+        normalize (bool, optional):     Normalize the node features to [0, 1].  Defaults to True.
+        anomaly_cat (list, optional):    Specify the category of anomaly, choose from ['cpu', 'hdd', 'loss', 'all'].
+                                                                                Defaults to ["all"].
+        anomaly_level (int, optional):  Specify the level of anomaly.           Defaults to None.
+        feature_option (str, optional): Specify the feature selected, choose from ['v1', 'v2', 'v3'].
+                                                                                Defaults to "v1".
+        sample_size (int, optional):    Sample size for the dataset.            Defaults to None.
+        transform (callable, optional): Transform function to process.          Defaults to None.
+        pre_transform (callable, optional): Pre_transform function.             Defaults to None.
+        pre_filter (callable, optional): Pre filter function.                   Defaults to None.
+    """
 
     def __init__(self,
                  root="./",
@@ -32,47 +52,14 @@ class PSD_Dataset(InMemoryDataset):
                  node_level=False,
                  binary_labels=False,
                  normalize=True,
-                 anomaly_cat="all",
+                 anomaly_cat=["all"],
                  anomaly_level=None,
-                 anomaly_num=None,
                  feature_option="v1",
+                 sample_size=None,
                  transform=None,
                  pre_transform=None,
-                 pre_filter=None):
-        """ Customized dataset for PoSeiDon graphs.
+                 pre_filter=None, **kwargs):
 
-        Args:
-            root (str, optional): Root of the processed path.
-                                  Defaults to "./".
-            name (str, optional): Name of the workflow type.
-                                  Defaults to "1000genome".
-            use_node_attr (bool, optional): Use node attributes.
-                                            Defaults to False.
-            use_edge_attr (bool, optional): Use edge attributes.
-                                            Defaults to False.
-            force_reprocess (bool, optional): Force to reprocess, will delete the cached file on disk.
-                                              Defaults to False.
-            node_level (bool, optional): Process as node level graphs if `True`.
-                                         Defaults to False.
-            binary_labels (bool, optional): Binary labels.
-                                            Defaults to False.
-            normalize (bool, optional): Normalize the node features to [0, 1].
-                                        Defaults to True.
-            anomaly_cat (str, optional): Specify the category of anomaly, choose from ['cpu', 'hdd', 'loss', 'all'].
-                                         Defaults to "all".
-            anomaly_level (int, optional): Specify the level of anomaly.
-                                              Defaults to None.
-            anomaly_num (int, optional): Specify the number of anomaly.
-                                            Defaults to None. Warning: this will be removed.
-            feature_option (str, optional): Specify the feature selected, choose from ['v1', 'v2'].
-                                            Defaults to "v1".
-            transform (callable, optional): Transform function to process.
-                                            Defaults to None.
-            pre_transform (callable, optional): Pre_transform function.
-                                                Defaults to None.
-            pre_filter (callable, optional): Pre filter function.
-                                             Defaults to None.
-        """
         self.root = root
         self.name = name.lower()
         self.use_node_attr = use_node_attr
@@ -81,10 +68,10 @@ class PSD_Dataset(InMemoryDataset):
         self.node_level = node_level
         self.binary_labels = binary_labels
         self.normalize = normalize
-        self.anomaly_cat = anomaly_cat.lower()
+        self.anomaly_cat = [ac.lower() for ac in anomaly_cat]
         self.anomaly_level = anomaly_level
-        self.anomaly_num = anomaly_num
         self.feature_option = feature_option
+        self.sample_size = sample_size
 
         if self.force_reprocess:
             SAVED_PATH = osp.join(osp.abspath(self.root), "processed", self.name)
@@ -93,7 +80,7 @@ class PSD_Dataset(InMemoryDataset):
                 os.remove(SAVED_FILE)
 
         # load data if processed
-        super().__init__(root, transform, pre_transform, pre_filter)
+        super().__init__(root, transform, pre_transform, pre_filter, **kwargs)
         self.data, self.slices, self.sizes = torch.load(self.processed_paths[0])
 
     @property
@@ -142,7 +129,7 @@ class PSD_Dataset(InMemoryDataset):
         """ Process the raw files, and save to processed files. """
 
         ''' process adj file '''
-        if self.name in ['1000genome_new_2022', 'montage']:
+        if self.name in ['1000genome_new_2022', 'montage', 'predict_future_sales', 'casa-wind-full']:
             data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data_new")
         else:
             data_folder = osp.join(osp.dirname(osp.abspath(__file__)), "..", "data")
@@ -168,23 +155,40 @@ class PSD_Dataset(InMemoryDataset):
              'queue_delay', 'runtime', 'post_script_delay', 'stage_in_delay',
              'stage_in_bytes', 'stage_out_delay', 'stage_out_bytes', 'kickstart_executables_cpu_time',
              'kickstart_status', 'kickstart_executables_exitcode']
+
+        self.new_features = ['kickstart_online_iowait',
+                             'kickstart_online_bytes_read',
+                             'kickstart_online_bytes_written',
+                             'kickstart_online_read_system_calls',
+                             'kickstart_online_write_system_calls',
+                             'kickstart_online_utime',
+                             'kickstart_online_stime',
+                             'kickstart_online_bytes_read_per_second',
+                             'kickstart_online_bytes_written_per_second']
+
         self.ts_features = ['ready', 'submit', 'execute_start', 'execute_end', 'post_script_start', 'post_script_end']
-        self.delay_features = ["wms_delay", "queue_delay", "runtime",
-                               "post_script_delay", "stage_in_delay", "stage_out_delay"]
+
+        self.delay_features = ["wms_delay",
+                               "queue_delay",
+                               "runtime",
+                               "post_script_delay",
+                               "stage_in_delay",
+                               "stage_out_delay"]
+
         self.bytes_features = ["stage_in_bytes", "stage_out_bytes"]
         self.kickstart_features = ["kickstart_executables_cpu_time"]
 
         data_list = []
         feat_list = []
 
-        if self.anomaly_cat == "all":
-            if self.name in ['1000genome_new_2022', 'montage']:
+        if self.anomaly_cat == ["all"]:
+            if self.name in ['1000genome_new_2022', 'montage', 'predict_future_sales', 'casa-wind-full']:
                 self.y_labels = ["normal", "cpu", "hdd"]
             else:
                 self.y_labels = ["normal", "cpu", "hdd", "loss"]
         else:
             if self.anomaly_level is None:
-                self.y_labels = ["normal", self.anomaly_cat]
+                self.y_labels = ["normal"] + self.anomaly_cat
             else:
                 self.y_labels = ["normal"] + [f"{self.anomaly_cat}_{level}" for level in self.anomaly_level]
 
@@ -216,8 +220,12 @@ class PSD_Dataset(InMemoryDataset):
                 df[self.ts_features] = df[self.ts_features].sub(df[self.ts_features].ready, axis="rows")
 
                 # process hops
-                hops = np.array([nx.shortest_path_length(self.nx_graph, 0, i) for i in range(len(nodes))])
-                df['node_hop'] = hops
+                if self.name != "predict_future_sales":
+                    # TODO: fix the hops fo
+                    hops = np.array([nx.shortest_path_length(self.nx_graph, 0, i) for i in range(len(nodes))])
+                    df['node_hop'] = hops
+                else:
+                    df['node_hop'] = np.zeros(len(nodes))
 
                 # change the index the same as `nodes`
                 for i, node in enumerate(df.index.values):
@@ -236,7 +244,7 @@ class PSD_Dataset(InMemoryDataset):
                         y = [1] * n_nodes if self.node_level else [1]
                 else:
                     y = [y_idx] * n_nodes if self.node_level else [y_idx]
-                if self.name in ['1000genome_new_2022', 'montage']:
+                if self.name in ['1000genome_new_2022', 'montage', 'predict_future_sales']:
                     if self.node_level:
                         # binary labels 0/1
                         y = pd.factorize(df.anomaly_type)[0]
@@ -257,12 +265,26 @@ class PSD_Dataset(InMemoryDataset):
                 elif self.feature_option == "v2":
                     selected_features = self.delay_features + self.bytes_features \
                         + self.kickstart_features + ['node_hop']
+                elif self.feature_option == "v3":
+                    selected_features = self.features + ['node_hop'] + self.new_features
 
                 df = df[selected_features]
 
-                x = torch.tensor(df.to_numpy(), dtype=torch.float32)
+                # add index to node
+                # df["pos"] = np.arange(df.shape[0])
+
+                x = torch.tensor(df.to_numpy().astype(np.float32), dtype=torch.float32)
                 feat_list.append(df.to_numpy())
-                data = Data(x=x, edge_index=edge_index, y=y)
+                node_index = torch.tensor(np.arange(n_nodes), dtype=torch.long)
+                data = Data(x=x,
+                            node_index=node_index,
+                            edge_index=edge_index,
+                            y=y)
+                # dump into local files
+                # pk_file = fn.split("/")[-1].split(".")[0]
+                # pk_path = osp.join(osp.dirname(osp.abspath(__file__)), "..", "parsed")
+                # create_dir(pk_path)
+                # pickle.dump(data, osp.join(pk_path, f"{pk_file}.pkl"))
                 data_list.append(data)
 
         # normalize across jobs
@@ -278,10 +300,28 @@ class PSD_Dataset(InMemoryDataset):
             for i, x in enumerate(norm_feat):
                 data_list[i].x = torch.tensor(x, dtype=torch.float32)
 
+        if self.sample_size is not None:
+
+            data_list = random.sample(data_list, self.sample_size)
+            # save to local files
+            # pk_path = osp.join(osp.dirname(osp.abspath(__file__)), "..", "parsed")
+            pk_path = osp.join("/tmp", "data", "psd", "parsed")
+            create_dir(pk_path)
+            file_count = 0
+            for root, directories, files in os.walk(pk_path):
+                file_count += len(files)
+                for fn in files:
+                    pre_data_list = pickle.load(open(osp.join(pk_path, fn), "rb"))
+                    data_list += pre_data_list
+            pickle.dump(data_list, open(osp.join(pk_path, f"iter_{file_count:04d}.pkl"), "wb"))
+
         # Save processed data
         if self.node_level:
             data_batch = Batch.from_data_list(data_list)
-            data = Data(x=data_batch.x, edge_index=data_batch.edge_index, y=data_batch.y)
+            data = Data(x=data_batch.x,
+                        node_index=data_batch.node_index % n_nodes,
+                        edge_index=data_batch.edge_index,
+                        y=data_batch.y)
             data = data if self.pre_transform is None else self.pre_transform(data)
 
             # NOTE: split the dataset into train/val/test as 60/20/20
@@ -320,9 +360,11 @@ class Merge_PSD_Dataset(InMemoryDataset):
                  normalize=True,
                  anomaly_cat="all",
                  anomaly_level=None,
+                 sample_size=None,
                  transform=None,
                  pre_transform=None,
                  pre_filter=None) -> None:
+
         self.root = root
         self.name = "all"
         self.use_node_attr = use_node_attr
@@ -331,18 +373,25 @@ class Merge_PSD_Dataset(InMemoryDataset):
         self.node_level = node_level
         self.binary_labels = binary_labels
         self.normalize = normalize
-        self.anomaly_cat = anomaly_cat.lower()
+        self.anomaly_cat = [ac.lower() for ac in anomaly_cat]
         self.anomaly_level = anomaly_level
+        self.sample_size = sample_size
 
-        workflows = ["1000genome",
-                     "nowcast-clustering-8",
-                     "nowcast-clustering-16",
-                     "wind-clustering-casa",
-                     "wind-noclustering-casa",
-                     "1000genome_new_2022",
-                     "montage"]
+        if self.force_reprocess:
+            if osp.exists(self.processed_paths[0]):
+                os.remove(self.processed_paths[0])
+
+        self.workflows = ["1000genome",
+                          "nowcast-clustering-8",
+                          "nowcast-clustering-16",
+                          "wind-clustering-casa",
+                          "wind-noclustering-casa",
+                          "1000genome_new_2022",
+                          "montage"] if name == "all" else name
         # check all data are consistent and available
-        for wf in workflows:
+        for wf in self.workflows:
+            _root = osp.join(osp.expanduser("~"), "tmp", "data", wf)
+            print("dataset", wf)
             dataset = PSD_Dataset(root=self.root,
                                   name=wf,
                                   use_node_attr=self.use_node_attr,
@@ -352,10 +401,11 @@ class Merge_PSD_Dataset(InMemoryDataset):
                                   binary_labels=self.binary_labels,
                                   normalize=self.normalize,
                                   anomaly_cat=self.anomaly_cat,
-                                  anomaly_level=self.anomaly_level)
+                                  anomaly_level=self.anomaly_level,
+                                  sample_size=self.sample_size)
 
         super().__init__(root, transform, pre_transform, pre_filter)
-        self.data, self.slices, _ = torch.load(self.processed_paths[0])
+        self.data, self.slices = torch.load(self.processed_paths[0])
 
     @property
     def processed_file_names(self):
@@ -372,37 +422,36 @@ class Merge_PSD_Dataset(InMemoryDataset):
     def process(self):
         """ process """
         data_list = []
-        for wn in ["1000genome",
-                   "nowcast-clustering-8",
-                   "nowcast-clustering-16",
-                   "wind-clustering-casa",
-                   "wind-noclustering-casa",
-                   "1000genome_new_2022",
-                   "montage"]:
+        for wn in self.workflows:
             wn_path = osp.join(osp.abspath(self.root), "processed", wn)
             data = torch.load(f'{wn_path}/binary_{self.binary_labels}_node_{self.node_level}.pt')[0]
             data_list.append(data)
 
         if self.node_level:
-            data_batch = Batch.from_data_list(data_list)
-            data = Data(x=data_batch.x, edge_index=data_batch.edge_index, y=data_batch.y)
+            data_batch = Batch.from_data_list(data_list, exclude_keys=['node_index'])
+            data = Data(x=data_batch.x,
+                        # node_index=data_batch.node_index,
+                        node_index=torch.concat([d.node_index for d in data_list]),
+                        edge_index=data_batch.edge_index,
+                        y=data_batch.y)
             data = data if self.pre_transform is None else self.pre_transform(data)
 
             # NOTE: split the dataset into train/val/test as 60/20/20
-            idx = np.arange(data.num_nodes)
-            train_idx, test_idx = train_test_split(
-                idx, train_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
-            val_idx, test_idx = train_test_split(
-                test_idx, train_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[test_idx])
+            # idx = np.arange(data.num_nodes)ddd
+            # train_idx, test_idx = train_test_split(
+            #     idx, train_size=0.6, random_state=0, shuffle=True, stratify=data.y.numpy())
+            # val_idx, test_idx = train_test_split(
+            #     test_idx, train_size=0.5, random_state=0, shuffle=True, stratify=data.y.numpy()[test_idx])
 
-            data.train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-            data.train_mask[train_idx] = 1
+            # data.train_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            # data.train_mask[train_idx] = 1
 
-            data.val_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-            data.val_mask[val_idx] = 1
+            # data.val_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            # data.val_mask[val_idx] = 1
 
-            data.test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
-            data.test_mask[test_idx] = 1
+            # data.test_mask = torch.zeros(data.num_nodes, dtype=torch.bool)
+            # data.test_mask[test_idx] = 1
+
             torch.save(self.collate([data]), self.processed_paths[0])
         else:
             data, slices = self.collate(data_list)

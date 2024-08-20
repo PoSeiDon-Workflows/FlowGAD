@@ -1,5 +1,6 @@
 """ Demo of node classification """
 
+import os.path as osp
 import random
 from datetime import datetime
 
@@ -10,17 +11,16 @@ from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
 from torch.nn import CrossEntropyLoss
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-
+import torch_geometric.transforms as T
 from psd_gnn.dataset import Merge_PSD_Dataset, PSD_Dataset
 from psd_gnn.models.node_classifier import GNN
-from psd_gnn.utils import eval_metrics, process_args
-
+from psd_gnn.utils import eval_metrics, process_args, create_dir
 
 if __name__ == "__main__":
 
     args = process_args()
-    if args["workflow"] in ["1000genome_new_2022", "montage"]:
-        from psd_gnn.dataset_v2 import PSD_Dataset
+    # if args["workflow"] in ["1000genome_new_2022", "montage"]:
+    #     from psd_gnn.dataset_v2 import PSD_Dataset
 
     if args['seed'] != -1:
         torch.manual_seed(args['seed'])
@@ -41,11 +41,13 @@ if __name__ == "__main__":
                               force_reprocess=args['force'],
                               node_level=True,
                               binary_labels=args['binary'],
+                              feature_option=args['feature_option'], 
                               anomaly_cat=args['anomaly_cat'],
                               anomaly_level=args['anomaly_level'],
                               anomaly_num=args['anomaly_num'],
                               )
 
+    # data = T.ToUndirected()(dataset[0])
     data = dataset[0]
     n_nodes = data.num_nodes
 
@@ -63,9 +65,11 @@ if __name__ == "__main__":
                                  lr=args['lr'],
                                  weight_decay=args['weight_decay'])
 
-    # weights for imbalanced data
-    class_weight = 1 - data.y[data.train_mask].bincount() / data.y[data.train_mask].shape[0]
-    loss_func = CrossEntropyLoss(weight=class_weight.to(DEVICE))
+    if args['balance']:
+        class_weight = 1 - data.y[data.train_mask].bincount() / data.y[data.train_mask].shape[0]
+        loss_func = CrossEntropyLoss(weight=class_weight.to(DEVICE))
+    else:
+        loss_func = CrossEntropyLoss()
 
     ts_start = datetime.now().strftime('%Y%m%d_%H%M%S')
     if args['log']:
@@ -74,6 +78,7 @@ if __name__ == "__main__":
 
     pbar = tqdm(range(args['epoch']), desc=args['workflow'], leave=True)
     model.train()
+    best = 0
     for e in pbar:
         optimizer.zero_grad()
         y_hat = model(data.x, data.edge_index)
@@ -90,6 +95,11 @@ if __name__ == "__main__":
         val_y_pred = y_hat[data.val_mask].argmax(dim=1).detach().cpu().numpy()
         val_acc = eval_metrics(val_y_true, val_y_pred, metric="acc")
 
+        if val_acc > best:
+            # save tmp model on disk
+            create_dir("tmp_models")
+            torch.save(model, osp.join(f"tmp_models",
+                                       f"saved_models_{args['workflow']}_{ts_start}"))
         if args['verbose']:
             pbar.set_postfix({"train_loss": train_loss.detach().cpu().item(),
                              "train_acc": train_acc,

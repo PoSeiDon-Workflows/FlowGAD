@@ -68,8 +68,8 @@ def test(model, loader):
 if __name__ == "__main__":
 
     args = process_args()
-    if args['workflow'] == "1000genome_new_2022":
-        from psd_gnn.dataset_v2 import PSD_Dataset
+    if args['workflow'] in ["1000genome_new_2022", "montage"]:
+        from psd_gnn.dataset import PSD_Dataset
 
     if args["seed"] != -1:
         random.seed(args['seed'])
@@ -83,10 +83,11 @@ if __name__ == "__main__":
     else:
         DEVICE = torch.device(f"cuda:{args['gpu']}") if torch.cuda.is_available() else "cpu"
 
+    ROOT = osp.join("/tmp", "data", "psd", args['workflow'])
     if args['workflow'] == "all":
         dataset = Merge_PSD_Dataset(node_level=False, binary_labels=args['binary']).shuffle()
     else:
-        dataset = PSD_Dataset("./", args['workflow'],
+        dataset = PSD_Dataset(ROOT, args['workflow'],
                               force_reprocess=args['force'],
                               node_level=False,
                               binary_labels=args['binary'],
@@ -98,6 +99,9 @@ if __name__ == "__main__":
     n_graphs = len(dataset)
     # ys = dataset.data.y.numpy()
 
+    # print(dataset.data.y.bincount())
+    # print(dataset[0].edge_index.shape, dataset[0].x.shape)
+    # exit()
     # split train/val/test
     train_idx, test_idx = train_test_split(
         np.arange(n_graphs), train_size=args['train_size'], random_state=0, shuffle=True)

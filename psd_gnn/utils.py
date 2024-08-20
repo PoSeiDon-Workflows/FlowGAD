@@ -30,6 +30,8 @@ def process_args():
                  "wind-noclustering-casa",
                  "1000genome_new_2022",
                  "montage",
+                 "predict_future_sales",
+                 "casa-wind-full",
                  "all"
                  ]
 
@@ -78,6 +80,10 @@ def process_args():
                         type=float,
                         default=0.5,
                         help="Dropout in neural networks.")
+    parser.add_argument("--feature_option",
+                        type=str,
+                        default="v1",
+                        help="Feature option.")
     parser.add_argument("--seed",
                         type=int,
                         default=-1,

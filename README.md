@@ -140,3 +140,28 @@ options:
   --anomaly_num ANOMALY_NUM
                         Specify the anomaly num from nodes.
 ```
+
+## Reference
+
+
+```
+@inproceedings{jin2022workflow,
+  title={Workflow anomaly detection with graph neural networks},
+  author={Jin, Hongwei and Raghavan, Krishnan and Papadimitriou, George and Wang, Cong and Mandal, Anirban and Krawczuk, Patrycja and Pottier, Lo{\"\i}c and Kiran, Mariam and Deelman, Ewa and Balaprakash, Prasanna},
+  booktitle={2022 IEEE/ACM Workshop on Workflows in Support of Large-Scale Science (WORKS)},
+  pages={35--42},
+  year={2022},
+  organization={IEEE}
+}
+
+@article{jin2023graph,
+  title={Graph neural networks for detecting anomalies in scientific workflows},
+  author={Jin, Hongwei and Raghavan, Krishnan and Papadimitriou, George and Wang, Cong and Mandal, Anirban and Kiran, Mariam and Deelman, Ewa and Balaprakash, Prasanna},
+  journal={The International Journal of High Performance Computing Applications},
+  volume={37},
+  number={3-4},
+  pages={394--411},
+  year={2023},
+  publisher={SAGE Publications Sage UK: London, England}
+}
+```
